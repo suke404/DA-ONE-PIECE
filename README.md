@@ -1,4 +1,4 @@
-# CMPT276F23_group2
+# Maze game built with JAVA
 
 To Build: mvn package
 
