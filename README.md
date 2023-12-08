@@ -1,4 +1,4 @@
-# Maze game built with JAVA
+# Maze game built with Maven
 
 To Build: mvn package
 
