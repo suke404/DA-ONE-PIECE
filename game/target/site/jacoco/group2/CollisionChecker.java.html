@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CollisionChecker.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2</a> &gt; <span class="el_source">CollisionChecker.java</span></div><h1>CollisionChecker.java</h1><pre class="source lang-java linenums">package group2;
+
+public class CollisionChecker {
+    GamePanel gp;
+
+<span class="nc" id="L6">    public CollisionChecker(GamePanel gp) {</span>
+<span class="nc" id="L7">        this.gp = gp;</span>
+<span class="nc" id="L8">    }</span>
+
+    public void checkTile(group2.Characters.MainCharacter character) {
+
+        // need more testing to adjust the mainCharacter collision object
+<span class="nc" id="L13">        int characterLeftWorldX = character.positionX + character.collisionArea.x;</span>
+<span class="nc" id="L14">        int characterRightWorldX = character.positionX + character.collisionArea.width + character.collisionArea.x;</span>
+<span class="nc" id="L15">        int characterTopWorldY = character.positionY + character.collisionArea.y;</span>
+<span class="nc" id="L16">        int characterBottomWorldY = character.positionY + character.collisionArea.height + character.collisionArea.y;</span>
+
+<span class="nc" id="L18">        int characterLeftCol = characterLeftWorldX / gp.TILE_SIZE;</span>
+<span class="nc" id="L19">        int characterRightCol = characterRightWorldX / gp.TILE_SIZE;</span>
+<span class="nc" id="L20">        int characterTopRow = characterTopWorldY / gp.TILE_SIZE;</span>
+<span class="nc" id="L21">        int characterBottomRow = characterBottomWorldY / gp.TILE_SIZE;</span>
+
+        // we only need to check 2 tiles left + right / top + down
+        int tileNum1, tileNum2;
+
+<span class="nc bnc" id="L26" title="All 5 branches missed.">        switch (&quot;up&quot;) {</span>
+            case &quot;up&quot;:
+<span class="nc" id="L28">                characterTopRow = (characterTopWorldY - character.speed) / gp.TILE_SIZE;</span>
+
+                // check left top
+<span class="nc" id="L31">                tileNum1 = gp.tileM.mapTileNum[characterLeftCol][characterTopRow];</span>
+
+                // check right top
+<span class="nc" id="L34">                tileNum2 = gp.tileM.mapTileNum[characterRightCol][characterTopRow];</span>
+<span class="nc bnc" id="L35" title="All 4 branches missed.">                if (gp.tileM.tile[tileNum1].collision == true || gp.tileM.tile[tileNum2].collision == true) {</span>
+<span class="nc" id="L36">                    character.collisionOn = true;</span>
+                }
+                break;
+            case &quot;down&quot;:
+<span class="nc" id="L40">                characterBottomRow = (characterBottomWorldY + character.speed) / gp.TILE_SIZE;</span>
+<span class="nc" id="L41">                tileNum1 = gp.tileM.mapTileNum[characterLeftCol][characterBottomRow];</span>
+<span class="nc" id="L42">                tileNum2 = gp.tileM.mapTileNum[characterRightCol][characterBottomRow];</span>
+<span class="nc bnc" id="L43" title="All 4 branches missed.">                if (gp.tileM.tile[tileNum1].collision == true || gp.tileM.tile[tileNum2].collision == true) {</span>
+<span class="nc" id="L44">                    character.collisionOn = true;</span>
+                }
+                break;
+            case &quot;left&quot;:
+<span class="nc" id="L48">                characterLeftCol = (characterTopWorldY + character.speed) / gp.TILE_SIZE;</span>
+<span class="nc" id="L49">                tileNum1 = gp.tileM.mapTileNum[characterRightCol][characterTopRow];</span>
+<span class="nc" id="L50">                tileNum2 = gp.tileM.mapTileNum[characterRightCol][characterBottomRow];</span>
+<span class="nc bnc" id="L51" title="All 4 branches missed.">                if (gp.tileM.tile[tileNum1].collision == true || gp.tileM.tile[tileNum2].collision == true) {</span>
+<span class="nc" id="L52">                    character.collisionOn = true;</span>
+                }
+                break;
+            case &quot;right&quot;:
+<span class="nc" id="L56">                characterRightCol = (characterRightWorldX - character.speed) / gp.TILE_SIZE;</span>
+<span class="nc" id="L57">                tileNum1 = gp.tileM.mapTileNum[characterLeftCol][characterTopRow];</span>
+<span class="nc" id="L58">                tileNum2 = gp.tileM.mapTileNum[characterLeftCol][characterBottomRow];</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">                if (gp.tileM.tile[tileNum1].collision == true || gp.tileM.tile[tileNum2].collision == true) {</span>
+<span class="nc" id="L60">                    character.collisionOn = true;</span>
+                }
+                break;
+        }
+<span class="nc" id="L64">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

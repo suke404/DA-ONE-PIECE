@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TileManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2.tile</a> &gt; <span class="el_source">TileManager.java</span></div><h1>TileManager.java</h1><pre class="source lang-java linenums">package group2.tile;
+
+import java.awt.Graphics2D;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import group2.GamePanel;
+import group2.Board;
+
+
+/**
+ * &lt;h1&gt; TileManager &lt;/h1&gt;
+ * This class is responsible for assigning images for each tile on the 2D board generated from the board class
+ */
+public class TileManager {
+
+    GamePanel gp;
+    public Tile[] tile;
+    public static int[][] mapTileNum;
+    public Board board;
+    /**
+     * This constructor for TileManager initializes all the variables and calls the map generation from the board class
+     * @param gp This is the game panel class that contains all the data related to the game
+     * @param board This is the board class that contains all teh data related to the board
+     */
+<span class="nc" id="L28">    public TileManager(GamePanel gp, Board board) {</span>
+
+<span class="nc" id="L30">        this.gp = gp;</span>
+<span class="nc" id="L31">        this.board = board;</span>
+<span class="nc" id="L32">        tile = new Tile[10];</span>
+        // put all the numbers from txt
+<span class="nc" id="L34">        mapTileNum = new int[gp.MAX_WORLD_ROW][gp.MAX_WORLD_COL];</span>
+<span class="nc" id="L35">        this.board.updateTerrain();</span>
+        //this.board.printMap();
+<span class="nc" id="L37">        getTileImage();</span>
+
+        //loadMap(&quot;game/resources/maps/world01.txt&quot;);
+<span class="nc" id="L40">        board.printMap();</span>
+<span class="nc" id="L41">        loadMap(this.board.getMap());</span>
+<span class="nc" id="L42">    }</span>
+    /**
+     * This returns the value of the index in the 2D map grid
+     * @param x column of grid
+     * @param y row of grid
+     * @return int
+     */
+    public static int checkTile (int x, int y) {
+<span class="nc" id="L50">        return mapTileNum[x][y];</span>
+    }
+
+    /**
+     * This method assignms an image to the tile
+     */
+    public void getTileImage() {
+
+        try {
+            // road
+<span class="nc" id="L60">            tile[0] = new Tile();</span>
+<span class="nc" id="L61">            tile[0].image = ImageIO.read(new File(&quot;game/resources/tiles/road00.png&quot;));</span>
+
+            // wall
+<span class="nc" id="L64">            tile[1] = new Tile();</span>
+<span class="nc" id="L65">            tile[1].image = ImageIO.read(new File(&quot;game/resources/tiles/wall.png&quot;));</span>
+<span class="nc" id="L66">            tile[1].collision = true;</span>
+            // grass
+<span class="nc" id="L68">            tile[2] = new Tile();</span>
+<span class="nc" id="L69">            tile[2].image = ImageIO.read(new File(&quot;game/resources/tiles/grass01.png&quot;));</span>
+
+            //end
+<span class="nc" id="L72">            tile[9] = new Tile();</span>
+<span class="nc" id="L73">            tile[9].image = ImageIO.read(new File(&quot;game/resources/tiles/end.png&quot;));</span>
+
+<span class="nc" id="L75">        } catch (IOException e) {</span>
+<span class="nc" id="L76">            e.printStackTrace();</span>
+<span class="nc" id="L77">        }</span>
+<span class="nc" id="L78">    }</span>
+    /**
+     * This method loads the map into the mapTileNum 2D array from the generated map from the board class
+     * @param map
+     */
+    public void loadMap(int[][] map) {
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            for (int i = 0; i &lt; gp.MAX_WORLD_ROW; i++){</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">                for(int j = 0; j &lt; gp.MAX_WORLD_COL; j++){</span>
+<span class="nc" id="L87">                    mapTileNum[j][i] = map[j][i];</span>
+                }
+            }
+
+<span class="nc" id="L91">    }</span>
+    public int[][] getMap(){
+<span class="nc" id="L93">        return mapTileNum;</span>
+    }
+    /**
+     * draw function that paints all the tiles by looping through the 2D grid and assigning an image to the tile depending on the value of the item
+     * @param g2
+     */
+    public void draw(Graphics2D g2) {
+
+<span class="nc" id="L101">        int worldCol = 0;</span>
+<span class="nc" id="L102">        int worldRow = 0;</span>
+
+
+<span class="nc bnc" id="L105" title="All 4 branches missed.">        while (worldCol &lt; gp.MAX_WORLD_COL &amp;&amp; worldRow &lt; gp.MAX_WORLD_ROW) {</span>
+
+<span class="nc" id="L107">            int tileNum = mapTileNum[worldCol][worldRow]; // gives int</span>
+
+<span class="nc" id="L109">            int worldX = worldCol * gp.TILE_SIZE;</span>
+<span class="nc" id="L110">            int worldY = worldRow * gp.TILE_SIZE;</span>
+<span class="nc" id="L111">            int screenX = worldX + gp.mainCharacter.mcX - gp.mainCharacter.positionX;</span>
+<span class="nc" id="L112">            int screenY = worldY + gp.mainCharacter.mcY - gp.mainCharacter.positionY;</span>
+<span class="nc bnc" id="L113" title="All 4 branches missed.">            if (tileNum &gt; 2 &amp;&amp; tileNum != 9){</span>
+<span class="nc" id="L114">                tileNum = 0;</span>
+            }
+<span class="nc" id="L116">            g2.drawImage(tile[tileNum].image, screenX, screenY, gp.TILE_SIZE, gp.TILE_SIZE, null);</span>
+<span class="nc" id="L117">            worldCol++;</span>
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">            if (worldCol == gp.MAX_WORLD_COL) {</span>
+<span class="nc" id="L120">                worldCol = 0;</span>
+<span class="nc" id="L121">                worldRow++;</span>
+            }
+<span class="nc" id="L123">        }</span>
+
+<span class="nc" id="L125">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

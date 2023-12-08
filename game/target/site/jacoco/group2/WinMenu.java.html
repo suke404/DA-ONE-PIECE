@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WinMenu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2</a> &gt; <span class="el_source">WinMenu.java</span></div><h1>WinMenu.java</h1><pre class="source lang-java linenums">package group2;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class WinMenu extends JFrame {
+    /**
+     * The width of the window.
+     */
+<span class="fc" id="L12">    final Integer WINDOW_X = 500;</span>
+    /**
+     * The height of the window.
+     */
+<span class="fc" id="L16">    final Integer WINDOW_Y = 500;</span>
+
+<span class="fc" id="L18">    public WinMenu() {</span>
+<span class="fc" id="L19">        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);</span>
+<span class="fc" id="L20">        setTitle(&quot;That's all folks!&quot;);</span>
+
+        // Load the background image
+<span class="fc" id="L23">        ImageIcon backgroundImageIcon = new ImageIcon(&quot;game/resources/menu/win.jpeg&quot;);</span>
+<span class="fc" id="L24">        Image backgroundImage = backgroundImageIcon.getImage().getScaledInstance(WINDOW_X, WINDOW_Y,</span>
+                Image.SCALE_SMOOTH);
+<span class="fc" id="L26">        ImageIcon scaledBackgroundIcon = new ImageIcon(backgroundImage);</span>
+
+        // Create a JLabel with the background image
+<span class="fc" id="L29">        JLabel backgroundLabel = new JLabel(scaledBackgroundIcon);</span>
+<span class="fc" id="L30">        setContentPane(backgroundLabel);</span>
+
+        // JButton restartButton = new JButton(&quot;Restart&quot;);
+        // restartButton.addActionListener(new ActionListener() {
+        //     @Override
+        //     public void actionPerformed(ActionEvent e) {
+        //         System.out.println(&quot;restart&quot;);
+        //     }
+        // });
+
+<span class="fc" id="L40">        JButton quitButton = new JButton(&quot;Quit&quot;);</span>
+<span class="fc" id="L41">        quitButton.addActionListener(new ActionListener() {</span>
+            @Override
+            public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L44">                System.exit(0);</span>
+<span class="nc" id="L45">            }</span>
+        });
+
+        // Create a vertical box layout
+<span class="fc" id="L49">        Box verticalBox = Box.createVerticalBox();</span>
+<span class="fc" id="L50">        verticalBox.add(Box.createVerticalGlue());</span>
+        // verticalBox.add(restartButton);
+<span class="fc" id="L52">        verticalBox.add(Box.createVerticalStrut(10));</span>
+<span class="fc" id="L53">        verticalBox.add(quitButton);</span>
+<span class="fc" id="L54">        verticalBox.add(Box.createVerticalGlue());</span>
+
+        // Set the layout of the JFrame
+<span class="fc" id="L57">        backgroundLabel.setLayout(new BoxLayout(backgroundLabel, BoxLayout.Y_AXIS));</span>
+<span class="fc" id="L58">        backgroundLabel.add(Box.createRigidArea(new Dimension(0, 50))); // Adjust the space at the top</span>
+<span class="fc" id="L59">        backgroundLabel.add(verticalBox);</span>
+
+        // Set the preferred size of the JFrame
+<span class="fc" id="L62">        setSize(new Dimension(WINDOW_X, WINDOW_Y));</span>
+
+<span class="fc" id="L64">        setLocationRelativeTo(null);</span>
+<span class="fc" id="L65">        setVisible(true);</span>
+<span class="fc" id="L66">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

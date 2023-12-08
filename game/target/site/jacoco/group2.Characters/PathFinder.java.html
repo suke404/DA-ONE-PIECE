@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PathFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2.Characters</a> &gt; <span class="el_source">PathFinder.java</span></div><h1>PathFinder.java</h1><pre class="source lang-java linenums">package group2.Characters;
+
+import java.util.PriorityQueue;
+import java.util.Stack;
+
+<span class="nc" id="L6">public class PathFinder {</span>
+
+    // A* Search Algorithm
+    // shortcut for (int, int) pair
+    public static class Pair {
+        int first;
+        int second;
+
+<span class="nc" id="L14">        public Pair(int first, int second) {</span>
+<span class="nc" id="L15">            this.first = first;</span>
+<span class="nc" id="L16">            this.second = second;</span>
+<span class="nc" id="L17">        }</span>
+
+        @Override
+        public boolean equals(Object obj) {
+<span class="nc bnc" id="L21" title="All 6 branches missed.">            return obj instanceof Pair &amp;&amp; this.first == ((Pair) obj).first &amp;&amp; this.second == ((Pair) obj).second;</span>
+        }
+    }
+
+    // Creating a shortcut for tuple&lt;int, int, int&gt; type
+    public static class Details {
+        double value;
+        int i;
+        int j;
+
+<span class="nc" id="L31">        public Details(double value, int i, int j) {</span>
+<span class="nc" id="L32">            this.value = value;</span>
+<span class="nc" id="L33">            this.i = i;</span>
+<span class="nc" id="L34">            this.j = j;</span>
+<span class="nc" id="L35">        }</span>
+    }
+
+    // a Cell (node) structure
+    public static class Cell {
+        public Pair parent;
+        // f = g + h, where h is heuristic
+        public double f, g, h;
+
+<span class="nc" id="L44">        Cell() {</span>
+<span class="nc" id="L45">            parent = new Pair(-1, -1);</span>
+<span class="nc" id="L46">            f = -1;</span>
+<span class="nc" id="L47">            g = -1;</span>
+<span class="nc" id="L48">            h = -1;</span>
+<span class="nc" id="L49">        }</span>
+
+<span class="nc" id="L51">        public Cell(Pair parent, double f, double g, double h) {</span>
+<span class="nc" id="L52">            this.parent = parent;</span>
+<span class="nc" id="L53">            this.f = f;</span>
+<span class="nc" id="L54">            this.g = g;</span>
+<span class="nc" id="L55">            this.h = h;</span>
+<span class="nc" id="L56">        }</span>
+    }
+
+    // method to check if our cell (row, col) is valid
+    boolean isValid(int[][] grid, int rows, int cols,
+            Pair point) {
+<span class="nc bnc" id="L62" title="All 4 branches missed.">        if (rows &gt; 0 &amp;&amp; cols &gt; 0)</span>
+<span class="nc bnc" id="L63" title="All 8 branches missed.">            return (point.first &gt;= 0) &amp;&amp; (point.first &lt; rows)</span>
+                    &amp;&amp; (point.second &gt;= 0)
+                    &amp;&amp; (point.second &lt; cols);
+
+<span class="nc" id="L67">        return false;</span>
+    }
+
+    // is the cell blocked?
+
+    boolean isUnBlocked(int[][] grid, int rows, int cols,
+            Pair point) {
+<span class="nc bnc" id="L74" title="All 4 branches missed.">        return isValid(grid, rows, cols, point)</span>
+                &amp;&amp; grid[point.first][point.second] == 1;
+    }
+
+    // Method to check if destination cell has been already reached
+    boolean isDestination(Pair position, Pair dest) {
+<span class="nc bnc" id="L80" title="All 4 branches missed.">        return position == dest || position.equals(dest);</span>
+    }
+
+    // Method to calculate heuristic function
+    double calculateHValue(Pair src, Pair dest) {
+<span class="nc" id="L85">        return Math.sqrt(Math.pow((src.first - dest.first), 2.0) + Math.pow((src.second - dest.second), 2.0));</span>
+    }
+
+    // Method for tracking the path from source to destination
+
+    void tracePath(
+            Cell[][] cellDetails,
+            int cols,
+            int rows,
+            Pair dest) { // A* Search algorithm path
+<span class="nc" id="L95">        System.out.println(&quot;The Path:  &quot;);</span>
+
+<span class="nc" id="L97">        Stack&lt;Pair&gt; path = new Stack&lt;&gt;();</span>
+
+<span class="nc" id="L99">        int row = dest.first;</span>
+<span class="nc" id="L100">        int col = dest.second;</span>
+
+<span class="nc" id="L102">        Pair nextNode = cellDetails[row][col].parent;</span>
+        do {
+<span class="nc" id="L104">            path.push(new Pair(row, col));</span>
+<span class="nc" id="L105">            nextNode = cellDetails[row][col].parent;</span>
+<span class="nc" id="L106">            row = nextNode.first;</span>
+<span class="nc" id="L107">            col = nextNode.second;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        } while (cellDetails[row][col].parent != nextNode); // until src</span>
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        while (!path.empty()) {</span>
+<span class="nc" id="L111">            Pair p = path.peek();</span>
+<span class="nc" id="L112">            path.pop();</span>
+<span class="nc" id="L113">            System.out.println(&quot;-&gt; (&quot; + p.first + &quot;,&quot; + p.second + &quot;) &quot;);</span>
+<span class="nc" id="L114">        }</span>
+<span class="nc" id="L115">    }</span>
+
+    // A main method, A* Search algorithm to find the shortest path
+
+    void aStarSearch(int[][] grid,
+            int rows,
+            int cols,
+            Pair src,
+            Pair dest) {
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (!isValid(grid, rows, cols, src)) {</span>
+<span class="nc" id="L126">            System.out.println(&quot;Source is invalid...&quot;);</span>
+<span class="nc" id="L127">            return;</span>
+        }
+
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (!isValid(grid, rows, cols, dest)) {</span>
+<span class="nc" id="L131">            System.out.println(&quot;Destination is invalid...&quot;);</span>
+<span class="nc" id="L132">            return;</span>
+        }
+
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (!isUnBlocked(grid, rows, cols, src)</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">                || !isUnBlocked(grid, rows, cols, dest)) {</span>
+<span class="nc" id="L137">            System.out.println(&quot;Source or destination is blocked...&quot;);</span>
+<span class="nc" id="L138">            return;</span>
+        }
+
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (isDestination(src, dest)) {</span>
+<span class="nc" id="L142">            System.out.println(&quot;We're already (t)here...&quot;);</span>
+<span class="nc" id="L143">            return;</span>
+        }
+
+<span class="nc" id="L146">        boolean[][] closedList = new boolean[rows][cols];// our closed list</span>
+
+<span class="nc" id="L148">        Cell[][] cellDetails = new Cell[rows][cols];</span>
+
+        int i, j;
+        // Initialising of the starting cell
+<span class="nc" id="L152">        i = src.first;</span>
+<span class="nc" id="L153">        j = src.second;</span>
+<span class="nc" id="L154">        cellDetails[i][j] = new Cell();</span>
+<span class="nc" id="L155">        cellDetails[i][j].f = 0.0;</span>
+<span class="nc" id="L156">        cellDetails[i][j].g = 0.0;</span>
+<span class="nc" id="L157">        cellDetails[i][j].h = 0.0;</span>
+<span class="nc" id="L158">        cellDetails[i][j].parent = new Pair(i, j);</span>
+
+        // Creating an open list
+
+        // PriorityQueue&lt;Details&gt; openList = new PriorityQueue&lt;&gt;((o1, o2) -&gt; (int) Math.round(o1.value - o2.value));
+
+<span class="nc" id="L164">        PriorityQueue&lt;Details&gt; openList = new PriorityQueue&lt;&gt;();</span>
+
+        // Put the starting cell on the open list, set f.startCell = 0
+
+<span class="nc" id="L168">        openList.add(new Details(0.0, i, j));</span>
+
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        while (!openList.isEmpty()) {</span>
+<span class="nc" id="L171">            Details p = openList.peek();</span>
+            // Add to the closed list
+<span class="nc" id="L173">            i = p.i; // second element of tuple</span>
+<span class="nc" id="L174">            j = p.j; // third element of tuple</span>
+
+            // Remove from the open list
+<span class="nc" id="L177">            openList.poll();</span>
+<span class="nc" id="L178">            closedList[i][j] = true;</span>
+
+            // Generating all the 8 neighbors of the cell
+
+<span class="nc bnc" id="L182" title="All 2 branches missed.">            for (int addX = -1; addX &lt;= 1; addX++) {</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                for (int addY = -1; addY &lt;= 1; addY++) {</span>
+<span class="nc" id="L184">                    Pair neighbour = new Pair(i + addX, j + addY);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">                    if (isValid(grid, rows, cols, neighbour)) {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                        if (cellDetails[neighbour.first] == null) {</span>
+<span class="nc" id="L187">                            cellDetails[neighbour.first] = new Cell[cols];</span>
+                        }
+<span class="nc bnc" id="L189" title="All 2 branches missed.">                        if (cellDetails[neighbour.first][neighbour.second] == null) {</span>
+<span class="nc" id="L190">                            cellDetails[neighbour.first][neighbour.second] = new Cell();</span>
+                        }
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                        if (isDestination(neighbour, dest)) {</span>
+<span class="nc" id="L194">                            cellDetails[neighbour.first][neighbour.second].parent = new Pair(i, j);</span>
+<span class="nc" id="L195">                            System.out.println(&quot;The destination cell is found&quot;);</span>
+<span class="nc" id="L196">                            tracePath(cellDetails, rows, cols, dest);</span>
+<span class="nc" id="L197">                            return;</span>
+                        }
+
+<span class="nc bnc" id="L200" title="All 2 branches missed.">                        else if (!closedList[neighbour.first][neighbour.second]</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                                &amp;&amp; isUnBlocked(grid, rows, cols, neighbour)) {</span>
+                            double gNew, hNew, fNew;
+<span class="nc" id="L203">                            gNew = cellDetails[i][j].g + 1.0;</span>
+<span class="nc" id="L204">                            hNew = calculateHValue(neighbour, dest);</span>
+<span class="nc" id="L205">                            fNew = gNew + hNew;</span>
+
+<span class="nc bnc" id="L207" title="All 4 branches missed.">                            if (cellDetails[neighbour.first][neighbour.second].f == -1</span>
+                                    || cellDetails[neighbour.first][neighbour.second].f &gt; fNew) {
+
+<span class="nc" id="L210">                                openList.add(new Details(fNew, neighbour.first, neighbour.second));</span>
+
+                                // Update the details of this
+                                // cell
+<span class="nc" id="L214">                                cellDetails[neighbour.first][neighbour.second].g = gNew;</span>
+                                // heuristic function cellDetails[neighbour.first][neighbour.second].h = hNew;
+<span class="nc" id="L216">                                cellDetails[neighbour.first][neighbour.second].f = fNew;</span>
+<span class="nc" id="L217">                                cellDetails[neighbour.first][neighbour.second].parent = new Pair(i, j);</span>
+                            }
+                        }
+                    }
+                }
+            }
+<span class="nc" id="L223">        }</span>
+
+<span class="nc" id="L225">        System.out.println(&quot;Failed to find the Destination Cell&quot;);</span>
+<span class="nc" id="L226">    }</span>
+
+    // test
+    public static void main(String[] args) {
+
+        // 0: The cell is blocked
+        // 1: The cell is not blocked
+
+<span class="nc" id="L234">        int[][] grid = {</span>
+                { 1, 1, 0, 0, 1, 0, 0, 0 },
+                { 1, 0, 0, 1, 1, 0, 1, 0 },
+                { 1, 1, 0, 1, 0, 0, 1, 0 },
+                { 1, 1, 0, 1, 1, 1, 1, 1 },
+                { 1, 1, 0, 0, 0, 1, 1, 1 },
+                { 0, 1, 1, 1, 0, 1, 1, 0 },
+                { 1, 1, 0, 1, 1, 1, 1, 0 },
+                { 0, 1, 1, 1, 1, 1, 1, 1 }
+
+        };
+
+        // Start is the left-most upper-most corner
+<span class="nc" id="L247">        Pair src = new Pair(0, 0);</span>
+        // (8, 0);
+
+        // Destination is the right-most bottom-most corner
+<span class="nc" id="L251">        Pair dest = new Pair(6, 6);</span>
+
+<span class="nc" id="L253">        PathFinder app = new PathFinder();</span>
+<span class="nc" id="L254">        app.aStarSearch(grid, grid.length, grid[0].length, src, dest);</span>
+
+<span class="nc" id="L256">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

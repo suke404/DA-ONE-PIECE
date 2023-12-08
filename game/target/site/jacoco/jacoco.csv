@@ -1,0 +1,27 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+game,group2.Rewards,BonusRewards,68,88,4,4,9,23,4,7,1,6
+game,group2.Rewards,Punishment,159,0,10,0,36,0,14,0,9,0
+game,group2.Rewards,BaseReward,83,98,4,6,16,29,8,11,5,9
+game,group2.Characters,Character,606,127,47,12,95,33,29,18,3,13
+game,group2.Characters,PathFinder,811,0,56,0,85,0,36,0,8,0
+game,group2.Characters,MovingEnemy,307,0,18,0,70,0,22,0,13,0
+game,group2.Characters,PathFinder.Pair,28,0,6,0,5,0,5,0,2,0
+game,group2.Characters,PathFinder.Details,12,0,0,0,5,0,1,0,1,0
+game,group2.Characters,MainCharacter,389,0,44,0,88,0,30,0,8,0
+game,group2.Characters,PathFinder.Cell,34,0,0,0,12,0,2,0,2,0
+game,group2.tile,TileManager,263,0,14,0,46,0,13,0,6,0
+game,group2.tile,Tile,6,0,0,0,2,0,1,0,1,0
+game,group2,Main,8,0,0,0,3,0,2,0,2,0
+game,group2,KeyHandler,115,0,34,0,40,0,21,0,4,0
+game,group2,GamePanel,545,0,29,0,132,0,24,0,8,0
+game,group2,WinMenu.new ActionListener() {...},3,6,0,0,2,1,1,1,1,1
+game,group2,StartMenu,217,0,0,0,52,0,5,0,5,0
+game,group2,Game,19,0,0,0,7,0,2,0,2,0
+game,group2,StartMenu.new ActionListener() {...},10,0,0,0,3,0,2,0,2,0
+game,group2,StartMenu.new ActionListener() {...},9,0,0,0,3,0,2,0,2,0
+game,group2,StartMenu.new ActionListener() {...},13,0,0,0,4,0,2,0,2,0
+game,group2,StartMenu.new ActionListener() {...},10,0,0,0,3,0,2,0,2,0
+game,group2,StaticEntity,0,151,0,0,0,39,0,14,0,14
+game,group2,WinMenu,0,113,0,0,0,24,0,1,0,1
+game,group2,CollisionChecker,302,0,21,0,33,0,14,0,2,0
+game,group2,Board,65,718,16,120,13,127,10,68,0,7

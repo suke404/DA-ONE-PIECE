@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StartMenu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2</a> &gt; <span class="el_source">StartMenu.java</span></div><h1>StartMenu.java</h1><pre class="source lang-java linenums">package group2;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/**
+ * The StartMenu class represents the main menu of the Maze Game.
+ * It provides options to start the game, view credits, read game rules, and
+ * exit the application.
+ */
+public class StartMenu extends JFrame {
+    /**
+     * The width of the window.
+     */
+<span class="nc" id="L17">    final Integer WINDOW_X = 500;</span>
+    /**
+     * The height of the window.
+     */
+<span class="nc" id="L21">    final Integer WINDOW_Y = 500;</span>
+
+    /**
+     * Constructs a new StartMenu.
+     * Initializes the main menu with buttons and background image.
+     */
+<span class="nc" id="L27">    public StartMenu() {</span>
+<span class="nc" id="L28">        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);</span>
+<span class="nc" id="L29">        setTitle(&quot;Start Menu&quot;);</span>
+        // Load and scale the background image
+<span class="nc" id="L31">        ImageIcon backgroundImageIcon = new ImageIcon(&quot;game/resources/menu/menu.jpg&quot;);</span>
+<span class="nc" id="L32">        Image backgroundImage = backgroundImageIcon.getImage().getScaledInstance(WINDOW_X, WINDOW_Y,</span>
+                Image.SCALE_SMOOTH);
+<span class="nc" id="L34">        ImageIcon scaledBackgroundIcon = new ImageIcon(backgroundImage);</span>
+<span class="nc" id="L35">        JLabel backgroundLabel = new JLabel(scaledBackgroundIcon);</span>
+<span class="nc" id="L36">        setContentPane(backgroundLabel);</span>
+
+        // Initialize and add action listeners to buttons
+<span class="nc" id="L39">        JButton startButton = new JButton(&quot;Start Game&quot;);</span>
+<span class="nc" id="L40">        startButton.addActionListener(new ActionListener() {</span>
+            @Override
+            public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L43">                startGame();</span>
+<span class="nc" id="L44">                dispose();</span>
+<span class="nc" id="L45">            }</span>
+        });
+
+<span class="nc" id="L48">        JButton creditsButton = new JButton(&quot;Credits&quot;);</span>
+<span class="nc" id="L49">        creditsButton.addActionListener(new ActionListener() {</span>
+            @Override
+            public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L52">                showCredits();</span>
+<span class="nc" id="L53">            }</span>
+        });
+
+<span class="nc" id="L56">        JButton rulesButton = new JButton(&quot;Rules&quot;);</span>
+<span class="nc" id="L57">        rulesButton.addActionListener(new ActionListener() {</span>
+            @Override
+            public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L60">                showRules();</span>
+<span class="nc" id="L61">            }</span>
+        });
+
+<span class="nc" id="L64">        JButton exitButton = new JButton(&quot;Exit&quot;);</span>
+<span class="nc" id="L65">        exitButton.addActionListener(new ActionListener() {</span>
+            @Override
+            public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L68">                System.exit(0);</span>
+<span class="nc" id="L69">            }</span>
+        });
+        // Create a vertical box layout for buttons
+<span class="nc" id="L72">        Box verticalBox = Box.createVerticalBox();</span>
+<span class="nc" id="L73">        verticalBox.add(Box.createVerticalGlue());</span>
+<span class="nc" id="L74">        verticalBox.add(startButton);</span>
+<span class="nc" id="L75">        verticalBox.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L76">        verticalBox.add(creditsButton);</span>
+<span class="nc" id="L77">        verticalBox.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L78">        verticalBox.add(rulesButton);</span>
+<span class="nc" id="L79">        verticalBox.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L80">        verticalBox.add(exitButton);</span>
+<span class="nc" id="L81">        verticalBox.add(Box.createVerticalGlue());</span>
+        // Set the layout of the background label
+<span class="nc" id="L83">        backgroundLabel.setLayout(new BoxLayout(backgroundLabel, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L84">        backgroundLabel.add(Box.createRigidArea(new Dimension(0, 50))); // Adjust the space at the top</span>
+<span class="nc" id="L85">        backgroundLabel.add(verticalBox);</span>
+        // Set the size and visibility of the JFrame
+<span class="nc" id="L87">        setSize(new Dimension(WINDOW_X, WINDOW_Y));</span>
+<span class="nc" id="L88">        setLocationRelativeTo(null);</span>
+<span class="nc" id="L89">        setVisible(true);</span>
+<span class="nc" id="L90">    }</span>
+
+    /**
+     * Starts the game by creating a new game window.
+     */
+    private void startGame() {
+<span class="nc" id="L96">        JFrame window = new JFrame();</span>
+<span class="nc" id="L97">        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L98">        window.setResizable(false);</span>
+<span class="nc" id="L99">        window.setTitle(&quot;Maze Game&quot;);</span>
+<span class="nc" id="L100">        GamePanel gamePanel = new GamePanel();</span>
+<span class="nc" id="L101">        window.add(gamePanel);</span>
+<span class="nc" id="L102">        window.pack();</span>
+<span class="nc" id="L103">        window.setLocationRelativeTo(null);</span>
+<span class="nc" id="L104">        window.setVisible(true);</span>
+<span class="nc" id="L105">        gamePanel.startGameThread();</span>
+<span class="nc" id="L106">    }</span>
+
+    /**
+     * Displays a dialog box showing the credits for the game.
+     */
+    private void showCredits() {
+<span class="nc" id="L112">        JOptionPane.showMessageDialog(this, &quot;Developed by:\nMichael Chan\nNathan Chan\nSri Srisathanantham\nShawn Xie&quot;,</span>
+                &quot;Credits&quot;, JOptionPane.INFORMATION_MESSAGE);
+<span class="nc" id="L114">    }</span>
+
+    /**
+     * Displays a dialog box showing the rules of the game.
+     */
+    private void showRules() {
+<span class="nc" id="L120">        JOptionPane.showMessageDialog(this,</span>
+                &quot;The objective of the game is to escape the maze!\nCollect all the coins while avoiding enemies and traps to unlock the door.\n Collect the optional beer on the field to boost your score higher!&quot;,
+                &quot;Rules&quot;, JOptionPane.INFORMATION_MESSAGE);
+<span class="nc" id="L123">    }</span>
+
+    /**
+     * The main method to launch the Maze Game's start menu.
+     *
+     * @param args UNUSED
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L131">        new StartMenu();</span>
+<span class="nc" id="L132">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StaticEntity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2</a> &gt; <span class="el_source">StaticEntity.java</span></div><h1>StaticEntity.java</h1><pre class="source lang-java linenums">package group2;
+
+/**
+ * The StaticEntity class is responsible for representing any non-moving,
+ * non-terrain entity on the map (items, traps etc.).
+ */
+public class StaticEntity {
+
+    // The current X and Y coordinates on the map. Should not move
+    private int positionX;
+    private int positionY;
+
+    private int screenX;
+
+    // Returns the width of the screen
+    public int getScreenX() {
+<span class="fc" id="L17">        return screenX;</span>
+    }
+
+    // Returns the height of the screen
+    private int screenY;
+
+    public int getScreenY() {
+<span class="fc" id="L24">        return screenY;</span>
+    }
+
+    // Height and width of the entity hitbox, determines collision
+    private int height;
+    private int width;
+
+    // This value determines the punishment/reward put on the player
+    private int effectValue;
+
+    // Tracks the position of the main character
+    private int mcX;
+    private int mcY;
+    private int mcPosX;
+    private int mcPosY;
+
+    private int TILE_SIZE;
+
+    /**
+     * Constructs a StaticEntity object with the specified parameters.
+     *
+     * @param positionX         The X-coordinate of the entity in the game world.
+     * @param positionY         The Y-coordinate of the entity in the game world.
+     * @param height            The height of the entity.
+     * @param width             The width of the entity.
+     * @param effectValue       The value representing the impact of the entity.
+     * @param mainCharacterData An array containing main character data: [mcX, mcY,
+     *                          mcPosX, mcPosY, TILE_SIZE].
+     */
+<span class="fc" id="L53">    public StaticEntity(int positionX, int positionY, int height, int width, int effectValue, int[] mainCharacterData) {</span>
+
+<span class="fc" id="L55">        this.height = height;</span>
+<span class="fc" id="L56">        this.width = width;</span>
+<span class="fc" id="L57">        this.effectValue = effectValue;</span>
+
+<span class="fc" id="L59">        this.mcX = mainCharacterData[0];</span>
+<span class="fc" id="L60">        this.mcY = mainCharacterData[1];</span>
+<span class="fc" id="L61">        this.mcPosX = mainCharacterData[2];</span>
+<span class="fc" id="L62">        this.mcPosY = mainCharacterData[3];</span>
+<span class="fc" id="L63">        this.TILE_SIZE = mainCharacterData[4];</span>
+
+<span class="fc" id="L65">        this.positionX = positionX * TILE_SIZE;</span>
+<span class="fc" id="L66">        this.positionY = positionY * TILE_SIZE;</span>
+
+<span class="fc" id="L68">        updatePosition(this.mcPosX, this.mcPosY);</span>
+<span class="fc" id="L69">    }</span>
+
+    // getters and setters for our class attributes
+    public int getHeight() {
+<span class="fc" id="L73">        return height;</span>
+    }
+
+    public void setHeight(int height) {
+<span class="fc" id="L77">        this.height = height;</span>
+<span class="fc" id="L78">    }</span>
+
+    public int getWidth() {
+<span class="fc" id="L81">        return width;</span>
+    }
+
+    public void setWidth(int width) {
+<span class="fc" id="L85">        this.width = width;</span>
+<span class="fc" id="L86">    }</span>
+
+    public int getPositionX() {
+
+<span class="fc" id="L90">        return positionX;</span>
+    }
+
+    public void setPositionX(int mcPosX) {
+<span class="fc" id="L94">        int worldX = positionX * TILE_SIZE;</span>
+<span class="fc" id="L95">        int screenX = worldX - mcX + mcPosX;</span>
+<span class="fc" id="L96">        this.positionX = screenX;</span>
+<span class="fc" id="L97">    }</span>
+
+    public int getPositionY() {
+<span class="fc" id="L100">        return positionY;</span>
+    }
+
+    public void setPositionY(int mcPosY) {
+<span class="fc" id="L104">        int worldY = positionX * TILE_SIZE;</span>
+<span class="fc" id="L105">        int screenY = worldY - mcY + mcPosY;</span>
+<span class="fc" id="L106">        this.positionY = screenY;</span>
+<span class="fc" id="L107">    }</span>
+
+    public int getEffectValue() {
+<span class="fc" id="L110">        return effectValue;</span>
+    }
+
+    public void setEffectValue(int effectValue) {
+<span class="fc" id="L114">        this.effectValue = effectValue;</span>
+<span class="fc" id="L115">    }</span>
+
+    /**
+     * Updates the position of the entity on the screen based on the main
+     * character's position.
+     *
+     * @param mcPosX The X-coordinate of the main character's position.
+     * @param mcPosY The Y-coordinate of the main character's position.
+     */
+    public void updatePosition(int mcPosX, int mcPosY) {
+<span class="fc" id="L125">        int worldX = positionX * TILE_SIZE;</span>
+<span class="fc" id="L126">        screenX = worldX - mcX + mcPosX;</span>
+
+<span class="fc" id="L128">        int worldY = positionY * TILE_SIZE;</span>
+<span class="fc" id="L129">        screenY = worldY - mcY + mcPosY;</span>
+<span class="fc" id="L130">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

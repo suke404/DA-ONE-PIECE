@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Character.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2.Characters</a> &gt; <span class="el_source">Character.java</span></div><h1>Character.java</h1><pre class="source lang-java linenums">package group2.Characters;
+
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+
+import group2.GamePanel;
+import group2.tile.TileManager;
+
+/**
+ * The base class representing a character in the game.
+ */
+public class Character {
+    /**
+     * character co-ordinate positions, width, height, and speed
+     */
+    public Integer speed, positionX, positionY, width, height;
+    /*
+     * if the character is sprinting
+     */
+    protected boolean sprint;
+    /*
+     * movement direction
+     */
+    protected int direction;
+<span class="fc" id="L25">    protected int index = 0;</span>
+
+    // checking for collision
+    public Rectangle collisionArea;
+<span class="fc" id="L29">    public boolean collisionOn = false;</span>
+
+    public void setPositionY(int positionY) {
+<span class="fc" id="L32">        this.positionY = positionY;</span>
+<span class="fc" id="L33">    }</span>
+
+    public void setPositionX(int positionX) {
+<span class="fc" id="L36">        this.positionX = positionX;</span>
+<span class="fc" id="L37">    }</span>
+
+    private BufferedImage currentFrame;
+    // public int direction //could be a vector
+    // might need key/value to call on?
+
+    // 2 differerent sprites
+    // private int spriteCodeLeft, spriteCodeRight;
+
+    /**
+     * Creates a new character with the specified initial position, size, and speed.
+     *
+     * @param x      The initial X-coordinate.
+     * @param y      The initial Y-coordinate.
+     * @param length The length (height and width) of the character.
+     * @param width  The width of the character.
+     * @param speed  The speed of the character.
+     */
+<span class="fc" id="L55">    public Character(int x, int y, int length, int width, int speed) {</span>
+<span class="fc" id="L56">        this.positionX = x * length;</span>
+<span class="fc" id="L57">        this.positionY = y * length;</span>
+<span class="fc" id="L58">        this.height = length;</span>
+<span class="fc" id="L59">        this.width = width;</span>
+
+<span class="fc" id="L61">        this.speed = speed;</span>
+        // get current grid position
+
+<span class="fc" id="L64">    }</span>
+
+    /**
+     * @return returns speed
+     */
+    public int getSpeed() {
+<span class="fc" id="L70">        return speed;</span>
+    }
+
+    /**
+     * @param speed new speed
+     */
+    public void setSpeed(int speed) {
+<span class="fc" id="L77">        this.speed = speed;</span>
+<span class="fc" id="L78">    }</span>
+
+    public BufferedImage getCurrentFrame() {
+<span class="fc" id="L81">        return currentFrame;</span>
+    }
+
+    public void setCurrentFrame(BufferedImage currentFrame) {
+<span class="nc" id="L85">        this.currentFrame = currentFrame;</span>
+<span class="nc" id="L86">    }</span>
+
+    /**
+     * @return width
+     */
+    public int getWidth() {
+<span class="fc" id="L92">        return this.width;</span>
+    }
+
+    /**
+     * 
+     * @return height
+     */
+    public int getHeight() {
+<span class="fc" id="L100">        return this.height;</span>
+    }
+
+    /**
+     * 
+     * @return x
+     */
+    public int getX() {
+<span class="fc" id="L108">        return this.positionX;</span>
+    }
+
+    /**
+     * 
+     * @return y
+     */
+    public int getY() {
+<span class="fc" id="L116">        return this.positionY;</span>
+    }
+
+    /**
+     * checks for collisions and if none, updates location accordingly, also handles
+     * game rewards and punishments for box collisions
+     * 
+     * @param direction the direction to be moved in
+     * @param type      the type of entity that is attempting to move (example:
+     *                  player)
+     */
+    // collisions will be in another file, so we will be sending the arrays
+    protected void updateLocation(int direction, String type) {
+<span class="nc" id="L129">        int gridSize = 48;</span>
+        // get new position
+        // first copy old
+
+        // new position is the furthest reach of our move (ex move right, position new =
+        // x + length + speed)
+<span class="nc" id="L135">        int checkPosition, checkGrid, a, b, gridType, gridTypeAlt = 0;</span>
+<span class="nc" id="L136">        int speed = this.speed;</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        if (sprint) {</span>
+<span class="nc" id="L138">            speed += 5;</span>
+        }
+
+        // System.out.println(&quot;character is at: &quot; + positionX + &quot;, &quot; + positionY);
+<span class="nc bnc" id="L142" title="All 5 branches missed.">        switch (direction) {</span>
+            // up
+            case -1:
+                // I want to do box collisions on the grids to my left
+                // box collision takes (x, y) -&gt; top left, width, and height
+<span class="nc" id="L147">                checkPosition = positionY + direction * speed; // subtracts speed from Y (up)</span>
+<span class="nc" id="L148">                checkGrid = checkPosition / gridSize;</span>
+
+                //
+<span class="nc" id="L151">                a = positionX / gridSize;</span>
+<span class="nc" id="L152">                b = (positionX + width) / gridSize;</span>
+<span class="nc" id="L153">                gridType = TileManager.checkTile(a, checkGrid);</span>
+<span class="nc" id="L154">                gridTypeAlt = TileManager.checkTile(b, checkGrid);</span>
+
+<span class="nc bnc" id="L156" title="All 4 branches missed.">                if (gridType == 1 || gridTypeAlt == 1) {</span>
+                    // partial movement to grid position
+                    // get the y co-ordinate of interfering grid, -&gt; positionY
+<span class="nc" id="L159">                    positionY = (positionY + (direction * speed) + height) / gridSize; // idk why but adding height in</span>
+                                                                                       // there works?
+<span class="nc" id="L161">                    positionY *= gridSize; // normalize</span>
+<span class="nc" id="L162">                    positionY++;</span>
+                } else {
+<span class="nc" id="L164">                    positionY += direction * speed;</span>
+                }
+
+<span class="nc" id="L167">                break;</span>
+            // down
+            case 1:
+                // I want to do box collisions on the grids to my left
+                // box collision takes (x, y) -&gt; top left, width, and height
+<span class="nc" id="L172">                checkPosition = positionY + height + direction * speed; // add speed from Y + height (down)</span>
+<span class="nc" id="L173">                checkGrid = checkPosition / gridSize;</span>
+                //
+<span class="nc" id="L175">                a = positionX / gridSize;</span>
+<span class="nc" id="L176">                b = (positionX + width) / gridSize;</span>
+<span class="nc" id="L177">                gridType = TileManager.checkTile(a, checkGrid);</span>
+<span class="nc" id="L178">                gridTypeAlt = TileManager.checkTile(b, checkGrid);</span>
+
+<span class="nc bnc" id="L180" title="All 4 branches missed.">                if (gridType == 1 || gridTypeAlt == 1) {</span>
+                    // partial movement to grid position
+                    // get the y co-ordinate of interfering grid, -&gt; positionY
+                    // positionY = (positionY + (direction * speed))/gridSize;
+                    // positionY *= gridSize;
+                    // positionY --;
+                } else {
+<span class="nc" id="L187">                    positionY += direction * speed;</span>
+                }
+<span class="nc" id="L189">                break;</span>
+            // left
+            case -2:
+<span class="nc" id="L192">                direction /= 2;</span>
+<span class="nc" id="L193">                checkPosition = positionX + direction * speed; // subtracts speed from Y (up)</span>
+<span class="nc" id="L194">                checkGrid = checkPosition / gridSize;</span>
+
+                //
+<span class="nc" id="L197">                a = positionY / gridSize;</span>
+<span class="nc" id="L198">                b = (positionY + height) / gridSize;</span>
+<span class="nc" id="L199">                gridType = TileManager.checkTile(checkGrid, a);</span>
+<span class="nc" id="L200">                gridTypeAlt = TileManager.checkTile(checkGrid, b);</span>
+
+<span class="nc bnc" id="L202" title="All 4 branches missed.">                if (gridType == 1 || gridTypeAlt == 1) {</span>
+                    // partial movement to grid position
+                    // get the y co-ordinate of interfering grid, -&gt; positionY
+<span class="nc" id="L205">                    positionX = (positionX + (direction * speed) + width) / gridSize; // idk why but adding width in</span>
+                                                                                      // there works?
+<span class="nc" id="L207">                    positionX *= gridSize; // normalize</span>
+<span class="nc" id="L208">                    positionX++; // offset by 1</span>
+                } else {
+<span class="nc" id="L210">                    positionX += direction * speed;</span>
+                }
+
+<span class="nc" id="L213">                break;</span>
+            // right
+            case 2:
+<span class="nc" id="L216">                direction /= 2;</span>
+<span class="nc" id="L217">                checkPosition = positionX + width + direction * speed; // add speed from Y + height (down)</span>
+<span class="nc" id="L218">                checkGrid = checkPosition / gridSize;</span>
+                //
+<span class="nc" id="L220">                a = positionY / gridSize;</span>
+<span class="nc" id="L221">                b = (positionY + height) / gridSize;</span>
+<span class="nc" id="L222">                gridType = TileManager.checkTile(checkGrid, a);</span>
+<span class="nc" id="L223">                gridTypeAlt = TileManager.checkTile(checkGrid, b);</span>
+
+<span class="nc bnc" id="L225" title="All 4 branches missed.">                if (gridType == 1 || gridTypeAlt == 1) {</span>
+                    // partial movement to grid position
+                    // get the y co-ordinate of interfering grid, -&gt; positionY
+                    // positionX = (positionX + (direction * speed))/gridSize;
+                    // positionX *= gridSize;
+                    // positionX --;
+                } else {
+<span class="nc" id="L232">                    positionX += direction * speed;</span>
+                }
+                break;
+        }
+
+        // check index and direction
+
+        // takes list of objects in grid spot, runs collision detection on those object
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (type == &quot;enemy&quot;) {</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (boxCollision(positionX, positionY, width, height, GamePanel.characters.get(0).positionX,</span>
+<span class="nc" id="L242">                    GamePanel.characters.get(0).positionY, GamePanel.characters.get(0).width,</span>
+<span class="nc" id="L243">                    GamePanel.characters.get(0).height)) {</span>
+                // System.out.println(&quot;index = &quot; + index);
+                // GamePanel.movingEnemies.remove(0);
+
+<span class="nc" id="L247">                GamePanel.characters.get(0).hit = true;</span>
+
+<span class="nc" id="L249">                GamePanel.gameState = 3;</span>
+<span class="nc" id="L250">                GamePanel.currentDialogue = &quot;YOU SUCK.&quot;;</span>
+<span class="nc" id="L251">                System.out.println(&quot;enemy touched&quot;);</span>
+            }
+        }
+
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (type != &quot;player&quot;) {</span>
+<span class="nc" id="L256">            return;</span>
+        }
+
+        // confirmed
+
+<span class="nc" id="L261">        System.out.println(GamePanel.score);</span>
+
+        // need to fix
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        for (int i = 0; i &lt; GamePanel.movingEnemies.size(); i++) {</span>
+            // fill in the rest
+            // System.out.println(&quot;check&quot;);
+            // System.out.println(GamePanel.movingEnemies.get(i).height);
+<span class="nc bnc" id="L268" title="All 2 branches missed.">            if (boxCollision(positionX, positionY, width, height, GamePanel.movingEnemies.get(i).positionX,</span>
+<span class="nc" id="L269">                    GamePanel.movingEnemies.get(i).positionY, GamePanel.movingEnemies.get(i).width,</span>
+<span class="nc" id="L270">                    GamePanel.movingEnemies.get(i).height)) {</span>
+<span class="nc" id="L271">                GamePanel.score--;</span>
+<span class="nc" id="L272">                GamePanel.movingEnemies.remove(i);</span>
+<span class="nc" id="L273">                GamePanel.gameState = 3;</span>
+<span class="nc" id="L274">                GamePanel.currentDialogue = &quot;YOU SUCK.&quot;;</span>
+<span class="nc" id="L275">                System.out.println(&quot;enemy touched&quot;);</span>
+            }
+        }
+
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        for (int i = 0; i &lt; GamePanel.baseRewards.size(); i++) {</span>
+            // fill in the rest
+<span class="nc bnc" id="L281" title="All 2 branches missed.">            if (boxCollision(positionX, positionY, width, height, GamePanel.baseRewards.get(i).getPositionX(),</span>
+<span class="nc" id="L282">                    GamePanel.baseRewards.get(i).getPositionY(), GamePanel.baseRewards.get(i).getWidth(),</span>
+<span class="nc" id="L283">                    GamePanel.baseRewards.get(i).getHeight())) {</span>
+                // no movement
+                // System.out.println(&quot;baseRewards!&quot; +
+                // GamePanel.baseRewards.get(i).getPositionX() + &quot; &quot; +
+                // GamePanel.baseRewards.get(i).getPositionY());
+<span class="nc" id="L288">                GamePanel.baseRewards.remove(i);</span>
+<span class="nc" id="L289">                GamePanel.score++;</span>
+
+            }
+        }
+
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        for (int i = 0; i &lt; GamePanel.bonusRewards.size(); i++) {</span>
+            // fill in the rest
+<span class="nc bnc" id="L296" title="All 2 branches missed.">            if (boxCollision(positionX, positionY, width, height, GamePanel.bonusRewards.get(i).getPositionX(),</span>
+<span class="nc" id="L297">                    GamePanel.bonusRewards.get(i).getPositionY(), GamePanel.bonusRewards.get(i).getWidth(),</span>
+<span class="nc" id="L298">                    GamePanel.bonusRewards.get(i).getHeight())) {</span>
+                // no movement
+                // System.out.println(&quot;bonusRewards!&quot; +
+                // GamePanel.bonusRewards.get(i).getPositionX() + &quot; &quot; +
+                // GamePanel.bonusRewards.get(i).getPositionY());
+<span class="nc" id="L303">                GamePanel.gameState = 3;</span>
+<span class="nc" id="L304">                GamePanel.currentDialogue = &quot;NICE&quot;;</span>
+<span class="nc" id="L305">                GamePanel.bonusRewards.remove(i);</span>
+<span class="nc" id="L306">                GamePanel.score += 5;</span>
+
+            }
+        }
+
+<span class="nc bnc" id="L311" title="All 2 branches missed.">        for (int i = 0; i &lt; GamePanel.punishments.size(); i++) {</span>
+            // fill in the rest
+<span class="nc bnc" id="L313" title="All 2 branches missed.">            if (boxCollision(positionX, positionY, width, height, GamePanel.punishments.get(i).getPositionX(),</span>
+<span class="nc" id="L314">                    GamePanel.punishments.get(i).getPositionY(), GamePanel.punishments.get(i).getWidth(),</span>
+<span class="nc" id="L315">                    GamePanel.punishments.get(i).getHeight())) {</span>
+                // no movement
+                // System.out.println(&quot;punishments!&quot; +
+                // GamePanel.punishments.get(i).getPositionX() + &quot; &quot; +
+                // GamePanel.punishments.get(i).getPositionY());
+                // GamePanel.punishments.remove(i);
+                // if (GamePanel.score &gt; 0) {
+                // GamePanel.score = 0;
+                // }
+
+<span class="nc" id="L325">                GamePanel.gameState = 3;</span>
+<span class="nc" id="L326">                GamePanel.currentDialogue = &quot;You have lost everything&quot;;</span>
+
+<span class="nc" id="L328">                GamePanel.gameEnd = true;</span>
+                // System.exit(0);
+            }
+        }
+
+        // else
+        // if (direction % 2 != 0) {
+        // positionY += direction * speed;
+        // System.out.println(&quot;Y = &quot; + positionY);
+        // } else {
+        // positionX += direction / 2 * speed;
+        // System.out.println(&quot;X = &quot; + positionX);
+        // }
+<span class="nc" id="L341">        return;</span>
+    }
+
+    public boolean inBounds(int x, int xi, int dx) {
+<span class="fc bfc" id="L345" title="All 4 branches covered.">        if (x &gt;= xi &amp;&amp; x &lt;= xi + dx) {</span>
+<span class="fc" id="L346">            return true;</span>
+        }
+
+        // else
+<span class="fc" id="L350">        return false;</span>
+    }
+
+    public boolean inBox(int xi, int dx, int ai, int da) {
+        // extra condition - box x is smaller than a
+<span class="fc bfc" id="L355" title="All 2 branches covered.">        if (inBounds(xi, ai, da)) {</span>
+<span class="fc" id="L356">            return true;</span>
+        }
+
+        // check left OR right
+<span class="pc bpc" id="L360" title="1 of 4 branches missed.">        if (inBounds(ai, xi, dx) || inBounds(ai + da, xi, dx)) {</span>
+<span class="fc" id="L361">            return true;</span>
+        }
+
+        // else:
+<span class="fc" id="L365">        return false;</span>
+    }
+
+    /**
+     * 
+     * @param b1x @param b1y: co-ordinates of top left for box 1
+     * @param b1w @param b1h: dimesions for box 1
+     * 
+     * @param b2x @param b2y: (x, y) top left for box 2
+     * 
+     * @param b2w @param b2h: co-ordinates for box 2
+     * 
+     * @return
+     */
+    public boolean boxCollision(int b1x, int b1y, int b1w, int b1h, int b2x, int b2y, int b2w, int b2h) {
+        // horizontal
+<span class="fc bfc" id="L381" title="All 2 branches covered.">        if (!inBox(b1x, b1w, b2x, b2w)) {</span>
+<span class="fc" id="L382">            return false;</span>
+        }
+
+        // vertical
+<span class="pc bpc" id="L386" title="1 of 2 branches missed.">        if (!inBox(b1y, b1h, b2y, b2h)) {</span>
+<span class="nc" id="L387">            return false;</span>
+        }
+
+        // else:
+<span class="fc" id="L391">        return true;</span>
+    }
+
+    public void speak() {
+<span class="nc" id="L395">    };</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MovingEnemy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2.Characters</a> &gt; <span class="el_source">MovingEnemy.java</span></div><h1>MovingEnemy.java</h1><pre class="source lang-java linenums">package group2.Characters;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
+
+import group2.GamePanel;
+
+/**
+ * Represents an enemy character that moves within the game.
+ */
+public class MovingEnemy extends Character {
+    // arrays to hold the different animation sprites
+<span class="nc" id="L18">    private BufferedImage[] walkingUpFrames = new BufferedImage[3];</span>
+<span class="nc" id="L19">    private BufferedImage[] walkingDownFrames = new BufferedImage[3];</span>
+<span class="nc" id="L20">    private BufferedImage[] walkingLeftFrames = new BufferedImage[3];</span>
+<span class="nc" id="L21">    private BufferedImage[] walkingRightFrames = new BufferedImage[3];</span>
+    private int currentFrameIndex;
+<span class="nc" id="L23">    private int slowDown = 0;</span>
+
+    // keeps track of last movement to display correct animation
+<span class="nc" id="L26">    private int lastDirection = -1;</span>
+
+    // keeps the enemy moving in a straight line for awhile before changing
+    // direction
+<span class="nc" id="L30">    private int stepsInCurrentDirection = 0;</span>
+<span class="nc" id="L31">    private final int maxStepsInDirection = 50;</span>
+
+<span class="nc" id="L33">    String dialogues[] = new String[20];</span>
+
+    /**
+     * Constructs a new MovingEnemy with the specified position, size, and speed.
+     *
+     * @param x      The x-coordinate of the enemy's initial position.
+     * @param y      The y-coordinate of the enemy's initial position.
+     * @param width  The width of the enemy's bounding box.
+     * @param height The height of the enemy's bounding box.
+     * @param speed  The speed at which the enemy moves.
+     */
+    public MovingEnemy(int x, int y, int width, int height, int speed, int index) {
+<span class="nc" id="L45">        super(x, y, width, height, speed); // 4 = speed (temp)</span>
+<span class="nc" id="L46">        this.index = index;</span>
+        // System.out.println(&quot;TESTING: Loading MovingEnemy images into our arrays!\n&quot;);
+<span class="nc" id="L48">        walkingUpFrames = loadFrames(&quot;/resources/sprites/MovingEnemy/meUp&quot;, 3);</span>
+<span class="nc" id="L49">        walkingDownFrames = loadFrames(&quot;/resources/sprites/MovingEnemy/meDown&quot;, 3);</span>
+<span class="nc" id="L50">        walkingLeftFrames = loadFrames(&quot;/resources/sprites/MovingEnemy/meLeft&quot;, 3);</span>
+<span class="nc" id="L51">        walkingRightFrames = loadFrames(&quot;/resources/sprites/MovingEnemy/meRight&quot;, 3);</span>
+<span class="nc" id="L52">        setDialogue();</span>
+<span class="nc" id="L53">    }</span>
+
+    /**
+     * Loads animation frames from the specified path.
+     *
+     * @param path       The path to the animation frames.
+     * @param frameCount The number of frames to load.
+     * @return An array of BufferedImage representing the animation frames.
+     */
+    private BufferedImage[] loadFrames(String path, int frameCount) {
+<span class="nc" id="L63">        BufferedImage[] frames = new BufferedImage[frameCount];</span>
+        try {
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            for (int i = 0; i &lt; frameCount; i++) {</span>
+                // System.out.println(&quot;TESTING: Image Path: &quot; + &quot;game&quot; + path + (i + 1) +
+                // &quot;.png\n&quot;);
+<span class="nc" id="L68">                frames[i] = ImageIO.read(new File(&quot;game&quot; + path + (i + 1) + &quot;.png&quot;));</span>
+
+                // testing
+                // System.out.println(&quot;MovingEnemy Images loaded successfully!\n&quot;);
+            }
+<span class="nc" id="L73">        } catch (IOException e) {</span>
+<span class="nc" id="L74">            System.out.println(&quot;ERROR: Couldn't load MovingEnemy images!\n&quot;);</span>
+<span class="nc" id="L75">            e.printStackTrace();</span>
+<span class="nc" id="L76">        }</span>
+<span class="nc" id="L77">        return frames;</span>
+    }
+
+    /**
+     * Draws the enemy on the graphics context.
+     *
+     * @param g2 The Graphics2D context.
+     * @param gp The GamePanel containing the main character.
+     */
+    public void draw(Graphics2D g2, GamePanel gp) {
+
+        // System.out.println(&quot;TESTING: Drawing movingEnemy&quot;);
+<span class="nc" id="L89">        BufferedImage frame = getCurrentFrame();</span>
+
+<span class="nc" id="L91">        int screenX = positionX + gp.mainCharacter.mcX - gp.mainCharacter.positionX;</span>
+<span class="nc" id="L92">        int screenY = positionY + gp.mainCharacter.mcY - gp.mainCharacter.positionY;</span>
+
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (frame != null) {</span>
+<span class="nc" id="L95">            g2.drawImage(frame, screenX, screenY, width, height, null);</span>
+        }
+<span class="nc" id="L97">    }</span>
+
+    public void setDialogue() {
+<span class="nc" id="L100">        dialogues[0] = &quot;BRUH... Play better...&quot;;</span>
+<span class="nc" id="L101">    }</span>
+
+    public void speak(GamePanel gp) {
+<span class="nc" id="L104">        GamePanel.currentDialogue = dialogues[0];</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Moves the enemy based on its current direction.
+     */
+    public void move() {
+        // Handle character movement based on user input
+        // currently movement is being handled here
+        // instead -&gt; call udpateLocation to check for stuff
+
+        // -1/1 is n/s, -2/2 is e/w
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (stepsInCurrentDirection &gt;= maxStepsInDirection) {</span>
+            // Change direction and reset the step counter
+<span class="nc" id="L118">            int direction = getRandomValue();</span>
+<span class="nc" id="L119">            lastDirection = direction;</span>
+<span class="nc" id="L120">            stepsInCurrentDirection = 0;</span>
+
+            // Increase the sleep duration to slow down the enemy's movement after changing
+            // direction
+
+<span class="nc" id="L125">        } else {</span>
+            // Continue moving in the current direction
+<span class="nc" id="L127">            int direction = lastDirection;</span>
+<span class="nc" id="L128">            updateLocation(direction, &quot;enemy&quot;);</span>
+<span class="nc" id="L129">            stepsInCurrentDirection++;</span>
+        }
+
+<span class="nc" id="L132">        changeFrame();</span>
+
+        // arbritrarily using walkingUpFrames as that value = 6
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (currentFrameIndex &gt;= walkingUpFrames.length) {</span>
+<span class="nc" id="L136">            currentFrameIndex = 0;</span>
+        }
+<span class="nc" id="L138">    }</span>
+
+    /**
+     * Gets the current animation frame for rendering.
+     *
+     * @return The BufferedImage representing the current animation frame.
+     */
+    public BufferedImage getCurrentFrame() {
+        BufferedImage[] currentFrames;
+
+        // Use the last direction to determine the sprites
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (lastDirection == -1) {</span>
+<span class="nc" id="L150">            currentFrames = walkingUpFrames;</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        } else if (lastDirection == 1) {</span>
+<span class="nc" id="L152">            currentFrames = walkingDownFrames;</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        } else if (lastDirection == -2) {</span>
+<span class="nc" id="L154">            currentFrames = walkingLeftFrames;</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        } else if (lastDirection == 2) {</span>
+<span class="nc" id="L156">            currentFrames = walkingRightFrames;</span>
+        } else {
+            // Use a default frame or standing frame when no movement keys are pressed
+            // For example, you can use walkingDownFrames as the default frame
+<span class="nc" id="L160">            currentFrames = walkingDownFrames;</span>
+        }
+
+<span class="nc" id="L163">        return currentFrames[currentFrameIndex];</span>
+    }
+
+    /**
+     * Gets the current animation frame index.
+     *
+     * @return The current animation frame index.
+     */
+    public int getCurrentFrameIndex() {
+<span class="nc" id="L172">        return currentFrameIndex;</span>
+    }
+
+    /**
+     * Gets the animation frames for walking up.
+     *
+     * @return The array of BufferedImage representing walking up frames.
+     */
+    public BufferedImage[] getWalkingUpFrames() {
+<span class="nc" id="L181">        return walkingUpFrames;</span>
+    }
+
+    /**
+     * Changes the animation frame based on a counter.
+     */
+    private void changeFrame() {
+<span class="nc" id="L188">        slowDown++;</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        if (slowDown == 5) {</span>
+<span class="nc" id="L190">            slowDown = 0;</span>
+<span class="nc" id="L191">            currentFrameIndex++;</span>
+        }
+<span class="nc" id="L193">    }</span>
+
+    /**
+     * Generates a random movement direction for the enemy.
+     *
+     * @return The randomly generated movement direction.
+     */
+    public static int getRandomValue() {
+<span class="nc" id="L201">        Random random = new Random();</span>
+
+        // Generating a random index to select a value from the array
+<span class="nc" id="L204">        int[] values = { -1, 1, -2, 2 };</span>
+<span class="nc" id="L205">        int randomIndex = random.nextInt(values.length);</span>
+
+<span class="nc" id="L207">        return values[randomIndex];</span>
+    }
+
+    /**
+     * Gets the last movement direction of the enemy.
+     *
+     * @return The last movement direction. Possible values: -1 (up), 1 (down), -2
+     *         (left), 2 (right).
+     */
+    public int getLastDirection() {
+<span class="nc" id="L217">        return lastDirection;</span>
+    }
+
+    /**
+     * Gets the maximum number of steps the enemy can move in the current direction
+     * before changing its direction.
+     *
+     * @return The maximum number of steps in the current direction.
+     */
+    public int getMaxStepsInDirection() {
+<span class="nc" id="L227">        return maxStepsInDirection;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

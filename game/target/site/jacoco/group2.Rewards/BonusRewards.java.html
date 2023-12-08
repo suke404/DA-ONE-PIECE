@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BonusRewards.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2.Rewards</a> &gt; <span class="el_source">BonusRewards.java</span></div><h1>BonusRewards.java</h1><pre class="source lang-java linenums">// Sprite Sources: https://opengameart.org/content/happy-beer-mug-animated
+
+package group2.Rewards;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
+
+import group2.GamePanel;
+
+public class BonusRewards extends BaseReward {
+
+    // sets the bounds for the random multiplier applied to base reward value
+    private static final int MIN_MULTIPLIER = 2;
+    private static final int MAX_MULTIPLIER = 10;
+
+    // arrays to hold the different animation sprites
+<span class="fc" id="L22">    private BufferedImage[] bufferedImage = new BufferedImage[4];</span>
+    private int currentFrameIndex;
+<span class="fc" id="L24">    private int slowDown = 0;</span>
+
+    /**
+     * Constructs a BonusRewards object with the specified parameters.
+     *
+     * @param positionX         the x-coordinate of the position
+     * @param positionY         the y-coordinate of the position
+     * @param height            the height of the bonus reward
+     * @param width             the width of the bonus reward
+     * @param rewardValue       the base reward value before applying the bonus
+     *                          multiplier
+     * @param mainCharacterData an array containing data about the main character
+     */
+    public BonusRewards(int positionX, int positionY, int height, int width, int rewardValue, int[] mainCharacterData) {
+<span class="fc" id="L38">        super(positionX, positionY, height, width, calculateBonus(rewardValue), mainCharacterData);</span>
+<span class="fc" id="L39">        bufferedImage = loadFrames(&quot;/resources/sprites/BonusReward/bonus&quot;, 4);</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Loads animation frames from the specified path with the given frame count.
+     *
+     * @param path       the path to the sprite images
+     * @param frameCount the number of frames in the animation
+     * @return an array of BufferedImage containing the animation frames
+     */
+    public BufferedImage[] loadFrames(String path, int frameCount) {
+<span class="fc" id="L50">        BufferedImage[] frames = new BufferedImage[frameCount];</span>
+        try {
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            for (int i = 0; i &lt; frameCount; i++) {</span>
+                // System.out.println(&quot;TESTING: Image Path: &quot; + &quot;game&quot; + path + (i + 1) +
+                // &quot;.png\n&quot;);
+<span class="nc" id="L55">                frames[i] = ImageIO.read(new File(&quot;game&quot; + path + (i + 1) + &quot;.png&quot;));</span>
+
+                // testing
+                // System.out.println(&quot;Images loaded successfully!\n&quot;);
+            }
+<span class="fc" id="L60">        } catch (IOException e) {</span>
+<span class="fc" id="L61">            System.out.println(&quot;ERROR: Couldn't load images!\n&quot;);</span>
+<span class="fc" id="L62">            e.printStackTrace();</span>
+<span class="nc" id="L63">        }</span>
+<span class="fc" id="L64">        return frames;</span>
+    }
+
+    public void updateAnimation() {
+        // Advance the frame index for the animation
+<span class="fc" id="L69">        changeFrame();</span>
+<span class="fc" id="L70">    }</span>
+
+    public void changeFrame() {
+<span class="fc" id="L73">        slowDown++;</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (slowDown == 10) {</span>
+<span class="fc" id="L75">            slowDown = 0;</span>
+<span class="fc" id="L76">            currentFrameIndex++;</span>
+        }
+
+        // Reset the frame index to loop the animation
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (currentFrameIndex &gt;= bufferedImage.length) {</span>
+<span class="nc" id="L81">            currentFrameIndex = 0;</span>
+        }
+<span class="fc" id="L83">    }</span>
+
+    public BufferedImage getCurrentFrame() {
+<span class="fc" id="L86">        return bufferedImage[currentFrameIndex];</span>
+    }
+
+    /**
+     * Draws the bonus reward on the specified Graphics2D object and GamePanel.
+     *
+     * @param g2 the Graphics2D object on which to draw the bonus reward
+     * @param gp the GamePanel containing information about the game state
+     */
+    public void draw(Graphics2D g2, GamePanel gp) {
+<span class="nc" id="L96">        BufferedImage frame = getCurrentFrame();</span>
+
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (frame != null) {</span>
+            // Draw the frame at the desired position (e.g., getX() and getY())
+<span class="nc" id="L100">            int screenX = getPositionX() + gp.mainCharacter.mcX - gp.mainCharacter.positionX;</span>
+<span class="nc" id="L101">            int screenY = getPositionY() + gp.mainCharacter.mcY - gp.mainCharacter.positionY;</span>
+
+<span class="nc" id="L103">            g2.drawImage(frame, screenX, screenY, getWidth(), getHeight(), null);</span>
+        }
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Calculates the bonus value by applying a random multiplier to the base reward
+     * value.
+     *
+     * @param rewardValue the base reward value before applying the bonus multiplier
+     * @return the calculated bonus value
+     */
+    private static int calculateBonus(int rewardValue) {
+<span class="fc" id="L115">        Random random = new Random();</span>
+<span class="fc" id="L116">        int randomMultiplier = random.nextInt(MAX_MULTIPLIER - MIN_MULTIPLIER + 1) + MIN_MULTIPLIER;</span>
+<span class="fc" id="L117">        return rewardValue * randomMultiplier;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

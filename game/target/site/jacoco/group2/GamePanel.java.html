@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GamePanel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2</a> &gt; <span class="el_source">GamePanel.java</span></div><h1>GamePanel.java</h1><pre class="source lang-java linenums">package group2;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+
+import javax.swing.JPanel;
+
+import group2.Characters.MainCharacter;
+import group2.Characters.MovingEnemy;
+import group2.Rewards.BaseReward;
+import group2.Rewards.BonusRewards;
+import group2.Rewards.Punishment;
+import group2.tile.TileManager;
+
+public class GamePanel extends JPanel implements Runnable {
+
+    // Screen Settings
+<span class="nc" id="L23">    final int ORIGINAL_TILE_SIZE = 16;</span>
+<span class="nc" id="L24">    final int SCALE = 3;</span>
+
+<span class="nc" id="L26">    public final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE;</span>
+<span class="nc" id="L27">    public final int MAX_SCREEN_COL = 16;</span>
+<span class="nc" id="L28">    public final int MAX_SCREEN_ROW = 16;</span>
+<span class="nc" id="L29">    public final int SCREEN_WIDTH = TILE_SIZE * MAX_SCREEN_COL;</span>
+<span class="nc" id="L30">    public final int SCREEN_HEIGHT = TILE_SIZE * MAX_SCREEN_ROW;</span>
+
+    // World settings
+<span class="nc" id="L33">    public final int MAX_WORLD_COL = 51;</span>
+<span class="nc" id="L34">    public final int MAX_WORLD_ROW = 51;</span>
+<span class="nc" id="L35">    public final int WORLD_WIDTH = TILE_SIZE * MAX_WORLD_COL;</span>
+<span class="nc" id="L36">    public final int WORLD_HEIGHT = TILE_SIZE * MAX_WORLD_ROW;</span>
+
+    // Game state
+<span class="nc" id="L39">    public static int gameState = 3;</span>
+<span class="nc" id="L40">    public static int welcome = 1;</span>
+<span class="nc" id="L41">    public final int diaglogueState = 3;</span>
+<span class="nc" id="L42">    public static String currentDialogue = &quot;Welcome to the DA ONE PIECE!&quot;;</span>
+
+    // Main Character Settings
+<span class="nc" id="L45">    final int MC_SPAWN_X = 1 * TILE_SIZE;</span>
+<span class="nc" id="L46">    final int MC_SPAWN_Y = 1 * TILE_SIZE;</span>
+
+    // Entity settings
+<span class="nc" id="L49">    final int BASE_REWARD_SIZE = 20;</span>
+<span class="nc" id="L50">    final int PUNISH_SIZE = 50;</span>
+<span class="nc" id="L51">    final int BONUS_REWARD_SIZE = 25;</span>
+<span class="nc" id="L52">    final int STANDARD_REWARD_VALUE = 1;</span>
+<span class="nc" id="L53">    final int STANDARD_PUNISH_VALUE = -1;</span>
+
+    // FPS
+<span class="nc" id="L56">    final int FPS = 60;</span>
+
+    // gameLogic
+<span class="nc" id="L59">    public static boolean gameEnd = false;</span>
+    public static int score;
+
+<span class="nc" id="L62">    Board map = new Board(MAX_WORLD_COL, MAX_WORLD_ROW, 5, 5);</span>
+
+<span class="nc" id="L64">    TileManager tileM = new TileManager(this, map);</span>
+
+    // keyhandler for user input for main character
+<span class="nc" id="L67">    KeyHandler keyH = new KeyHandler(this);</span>
+    Thread gameThread;
+
+<span class="nc" id="L70">    public CollisionChecker cChecker = new CollisionChecker(this);</span>
+
+    // Main Character
+<span class="nc" id="L73">    public static ArrayList&lt;MainCharacter&gt; characters = new ArrayList&lt;MainCharacter&gt;();</span>
+<span class="nc" id="L74">    public MainCharacter mainCharacter = new MainCharacter(TILE_SIZE, TILE_SIZE, TILE_SIZE, TILE_SIZE, keyH, this);</span>
+
+    // Moving Enemy
+    // MovingEnemy movingEnemy = new MovingEnemy(300, 300, TILE_SIZE, TILE_SIZE, 4);
+<span class="nc" id="L78">    public static ArrayList&lt;MovingEnemy&gt; movingEnemies = new ArrayList&lt;MovingEnemy&gt;();</span>
+    // Base Rewards
+<span class="nc" id="L80">    public static ArrayList&lt;BaseReward&gt; baseRewards = new ArrayList&lt;BaseReward&gt;();</span>
+    // BaseReward baseReward = new BaseReward(200, 200, BASE_REWARD_SIZE,
+    // BASE_REWARD_SIZE, STANDARD_REWARD_VALUE);
+
+    // Punishment
+    // Punishment punishment = new Punishment(250, 250, PUNISH_SIZE, PUNISH_SIZE,
+    // STANDARD_PUNISH_VALUE);
+<span class="nc" id="L87">    public static ArrayList&lt;Punishment&gt; punishments = new ArrayList&lt;Punishment&gt;();</span>
+    // Bonus Reward
+    // BonusRewards bonusReward = new BonusRewards(100, 200, BONUS_REWARD_SIZE,
+    // BONUS_REWARD_SIZE, STANDARD_REWARD_VALUE);
+
+<span class="nc" id="L92">    public static ArrayList&lt;BonusRewards&gt; bonusRewards = new ArrayList&lt;BonusRewards&gt;();</span>
+
+<span class="nc" id="L94">    public GamePanel() {</span>
+<span class="nc" id="L95">        this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));</span>
+<span class="nc" id="L96">        this.setBackground(Color.black);</span>
+        // better rendering performance
+<span class="nc" id="L98">        this.setDoubleBuffered(true);</span>
+<span class="nc" id="L99">        this.addKeyListener(keyH);</span>
+<span class="nc" id="L100">        this.setFocusable(true);</span>
+<span class="nc" id="L101">        initializeEntities();</span>
+<span class="nc" id="L102">    }</span>
+
+    public void initializeEntities() {
+<span class="nc" id="L105">        characters.add(mainCharacter);</span>
+
+<span class="nc" id="L107">        int[][] map = tileM.getMap();</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        for (int i = 0; i &lt; map.length; i++) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            for (int j = 0; j &lt; map[0].length; j++) {</span>
+<span class="nc" id="L110">                int value = map[j][i];</span>
+
+                // Passing in index of of 2D array and convert to world coordinates in
+                // constructor
+
+<span class="nc" id="L115">                int[] characterInput = { mainCharacter.mcX, mainCharacter.mcY, mainCharacter.positionX,</span>
+<span class="nc" id="L116">                        mainCharacter.positionY, TILE_SIZE };</span>
+<span class="nc bnc" id="L117" title="All 5 branches missed.">                switch (value) {</span>
+                    case 3:
+<span class="nc" id="L119">                        BonusRewards bonusReward = new BonusRewards(j, i, BONUS_REWARD_SIZE, BONUS_REWARD_SIZE,</span>
+                                STANDARD_REWARD_VALUE, characterInput);
+<span class="nc" id="L121">                        bonusRewards.add(bonusReward);</span>
+<span class="nc" id="L122">                        break;</span>
+                    case 4:
+<span class="nc" id="L124">                        BaseReward baseReward = new BaseReward(j, i, BASE_REWARD_SIZE, BASE_REWARD_SIZE,</span>
+                                STANDARD_REWARD_VALUE, characterInput);
+<span class="nc" id="L126">                        baseRewards.add(baseReward);</span>
+<span class="nc" id="L127">                        break;</span>
+                    case 5:
+<span class="nc" id="L129">                        int index = movingEnemies.size();</span>
+<span class="nc" id="L130">                        MovingEnemy movingEnemy = new MovingEnemy(j, i, TILE_SIZE, TILE_SIZE, 4, index);</span>
+<span class="nc" id="L131">                        movingEnemies.add(movingEnemy);</span>
+<span class="nc" id="L132">                        break;</span>
+                    case 6:
+<span class="nc" id="L134">                        Punishment punishment = new Punishment(j, i, PUNISH_SIZE, PUNISH_SIZE, STANDARD_PUNISH_VALUE,</span>
+                                characterInput);
+<span class="nc" id="L136">                        punishments.add(punishment);</span>
+                        break;
+                }
+            }
+        }
+<span class="nc" id="L141">    }</span>
+
+    public void drawDiagloueScreen(Graphics2D g2) {
+
+        //window
+<span class="nc" id="L146">        int x = ORIGINAL_TILE_SIZE * 2;</span>
+<span class="nc" id="L147">        int y = ORIGINAL_TILE_SIZE/2;</span>
+<span class="nc" id="L148">        int width = SCREEN_WIDTH - (ORIGINAL_TILE_SIZE*4);</span>
+<span class="nc" id="L149">        int hegiht = ORIGINAL_TILE_SIZE*10;</span>
+        
+<span class="nc" id="L151">        drawSubWindow(x, y, width, hegiht, g2);</span>
+
+<span class="nc" id="L153">        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));</span>
+<span class="nc" id="L154">        x+= ORIGINAL_TILE_SIZE + 10;</span>
+<span class="nc" id="L155">        y+= ORIGINAL_TILE_SIZE + 20;</span>
+<span class="nc" id="L156">        g2.drawString(currentDialogue, x, y);</span>
+<span class="nc" id="L157">    }</span>
+
+    public void drawSubWindow(int x, int y, int width, int height, Graphics2D g2) {
+<span class="nc" id="L160">        Color c = new Color(0,0,0, 200);</span>
+<span class="nc" id="L161">        g2.setColor(c);</span>
+<span class="nc" id="L162">        g2.fillRoundRect(x,y,width, height, 35, 35);</span>
+
+<span class="nc" id="L164">        c = new Color(255, 255, 255);</span>
+<span class="nc" id="L165">        g2.setColor(c);</span>
+<span class="nc" id="L166">        g2.setStroke(new BasicStroke(5));</span>
+<span class="nc" id="L167">        g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 25, 25);</span>
+<span class="nc" id="L168">    }</span>
+
+    public void startGameThread() {
+<span class="nc" id="L171">        gameThread = new Thread(this);</span>
+<span class="nc" id="L172">        gameThread.start();</span>
+<span class="nc" id="L173">    }</span>
+
+    // game loop: the core of the whole program
+    @Override
+    public void run() {
+        // tileM.mapTileNum[2][2] = 9;
+<span class="nc" id="L179">        double drawInterval = 1000000000 / FPS; // 0.01666 seoncds</span>
+<span class="nc" id="L180">        double nextDrawTime = System.nanoTime() + drawInterval;</span>
+<span class="nc bnc" id="L181" title="All 4 branches missed.">        while (gameThread != null &amp;&amp; !gameEnd) {</span>
+            // receive update
+<span class="nc" id="L183">            mainCharacter.move();</span>
+<span class="nc" id="L184">            mainCharacter.action();</span>
+
+<span class="nc bnc" id="L186" title="All 2 branches missed.">            for (MovingEnemy i : movingEnemies) {</span>
+                // sending gp in so it can get mc offsets
+<span class="nc" id="L188">                i.move();</span>
+<span class="nc" id="L189">            }</span>
+
+            // draw the screen with updated things
+<span class="nc" id="L192">            repaint();</span>
+
+            try {
+<span class="nc" id="L195">                double remainingTime = nextDrawTime - System.nanoTime();</span>
+<span class="nc" id="L196">                remainingTime = remainingTime / 1000000;</span>
+
+                // if the update and repaint took more time than
+                // the drawInerval then no time is left
+                // rare but just in case
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                if (remainingTime &lt; 0) {</span>
+<span class="nc" id="L202">                    remainingTime = 0;</span>
+                }
+
+<span class="nc" id="L205">                Thread.sleep((long) remainingTime); // typecast</span>
+
+<span class="nc" id="L207">                nextDrawTime += drawInterval;</span>
+
+<span class="nc" id="L209">            } catch (InterruptedException e) {</span>
+<span class="nc" id="L210">                e.printStackTrace();</span>
+<span class="nc" id="L211">            }</span>
+        }
+
+<span class="nc" id="L214">        System.out.println(&quot;stopped&quot;);</span>
+        //spawn window here
+<span class="nc" id="L216">        new WinMenu();</span>
+<span class="nc" id="L217">    }</span>
+
+    public void paintComponent(Graphics g) {
+
+<span class="nc" id="L221">        super.paintComponent(g);</span>
+
+<span class="nc" id="L223">        Graphics2D g2 = (Graphics2D) g;</span>
+
+        // draw tile first as the first layer
+<span class="nc" id="L226">        tileM.draw(g2);</span>
+
+<span class="nc" id="L228">        mainCharacter.draw(g2);</span>
+
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        for (MovingEnemy i : movingEnemies) {</span>
+            // sending gp in so it can get mc offsets
+<span class="nc" id="L232">            i.draw(g2, this);</span>
+<span class="nc" id="L233">        }</span>
+
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        for (BonusRewards i : bonusRewards) {</span>
+            // i.updatePosition(mainCharacter.positionX, mainCharacter.positionY);
+<span class="nc" id="L237">            i.updateAnimation();</span>
+<span class="nc" id="L238">            i.draw(g2, this);</span>
+<span class="nc" id="L239">        }</span>
+
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        for (Punishment i : punishments) {</span>
+            // i.updatePosition(mainCharacter.positionX, mainCharacter.positionY);
+<span class="nc" id="L243">            i.updateAnimation();</span>
+<span class="nc" id="L244">            i.draw(g2, this);</span>
+<span class="nc" id="L245">        }</span>
+
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        for (BaseReward i : baseRewards) {</span>
+            // i.updatePosition(mainCharacter.positionX, mainCharacter.positionY);
+<span class="nc" id="L249">            i.updateAnimation();</span>
+<span class="nc" id="L250">            i.draw(g2, this);</span>
+<span class="nc" id="L251">        }</span>
+
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        if(gameState == welcome) {</span>
+<span class="nc" id="L254">            currentDialogue = &quot;Welcome to the DA ONE PIECEs!&quot;;</span>
+<span class="nc" id="L255">            drawDiagloueScreen(g2);</span>
+<span class="nc" id="L256">            gameState = 0;</span>
+        }
+
+<span class="nc bnc" id="L259" title="All 2 branches missed.">        if(gameState == diaglogueState) {</span>
+<span class="nc" id="L260">            drawDiagloueScreen(g2);</span>
+        }
+
+<span class="nc" id="L263">        g2.dispose();</span>
+
+<span class="nc" id="L265">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

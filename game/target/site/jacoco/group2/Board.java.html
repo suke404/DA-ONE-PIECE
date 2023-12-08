@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Board.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2</a> &gt; <span class="el_source">Board.java</span></div><h1>Board.java</h1><pre class="source lang-java linenums">package group2;
+
+import java.util.Random;
+import java.util.Stack;
+
+import java.lang.Math;
+
+
+/**
+ * &lt;h1&gt;Board Class &lt;/h1&gt;
+ * This class holds the variables and methods necessary for generating the maze. The output which comes from getMap() will be a 2D array and each value
+ * in that index will be what represent what spawns on the board. 0 = walkable path, 1 = wall, 3 = base reward, 4 = bonus reward, 5 = trap, 6 = enemy
+ */
+public class Board {
+
+    protected int[][] spawnable;
+
+    protected int mapWidth;
+    protected int mapHeight;
+
+    protected int roomWidth;
+    protected int roomHeight;
+
+    protected int roomSpawnFrequency;
+
+    protected int[][] terrain;
+  
+<span class="fc" id="L28">   private Random rand = new Random();</span>
+    private boolean spawnEndpoint;
+
+    /**
+     * This is the constructor for the board class which initializes all the values
+     * @param width this is the width 2D map grid
+     * @param height this is the height of the 2D map grid
+     * @param roomWidth this is the width of the room randomly spawns on the map
+     * @param roomHeight this is the height of the room that randomly spawns on the map
+     */
+<span class="fc" id="L38">    public Board(int width, int height, int roomWidth, int roomHeight) {</span>
+<span class="fc" id="L39">        mapWidth = width;</span>
+<span class="fc" id="L40">        mapHeight = height;</span>
+<span class="fc" id="L41">        this.roomWidth = roomWidth;</span>
+<span class="fc" id="L42">        this.roomHeight = roomHeight;</span>
+<span class="fc" id="L43">        terrain = new int[mapWidth][mapHeight];</span>
+<span class="fc" id="L44">        roomSpawnFrequency = (int) (this.mapWidth * this.mapHeight * 0.025);</span>
+<span class="fc" id="L45">        spawnEndpoint = true;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * This function utilizes recursive backtracking to generate a maze. During which it will also spawn rooms and other entities such as rewards
+     * and enemies
+     */
+    public void updateTerrain() {
+<span class="pc bpc" id="L53" title="1 of 4 branches missed.">        if (this.mapWidth &lt;= 1 || this.mapHeight &lt;= 1){</span>
+<span class="fc" id="L54">            return;</span>
+        }
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        for (int i = 0; i &lt; this.mapHeight; i++) {</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            for (int j = 0; j &lt; this.mapWidth; j++) {</span>
+<span class="fc bfc" id="L58" title="All 4 branches covered.">                if (i % 2 == 0 || j % 2 == 0)</span>
+<span class="fc" id="L59">                    this.terrain[i][j] = 1;</span>
+                else
+<span class="fc" id="L61">                    this.terrain[i][j] = 2;</span>
+            }
+        }
+
+<span class="fc" id="L65">        Stack&lt;Integer&gt; visited = new Stack&lt;Integer&gt;();</span>
+<span class="fc" id="L66">        int currentIndex = this.mapWidth + 1;</span>
+<span class="fc" id="L67">        visited.push(currentIndex);</span>
+<span class="fc" id="L68">        this.recursiveBacktracking(1, 1, visited);</span>
+<span class="fc" id="L69">        int randomColumn = rand.nextInt(this.mapWidth-2) + 1;</span>
+<span class="fc" id="L70">        this.terrain[this.mapHeight-2][randomColumn] = 9;</span>
+
+<span class="fc" id="L72">    }</span>
+    /**
+     * This function verfies if an item is able to spawn in a index of the 2D grid
+     * @param row this is the row in which the entity will be spawned
+     * @param col this is the col in which the entity will be spawned
+     * @return boolean This will return a boolean value of whether the entity can spawn in the given row and col
+     */
+    public boolean validSpawn(int row, int col){
+<span class="fc" id="L80">        int playerDistance = (int) Math.sqrt(Math.pow(row -1,2) + Math.pow(col-1,2));</span>
+<span class="fc bfc" id="L81" title="All 4 branches covered.">        if (this.terrain[row][col] == 0 &amp;&amp; playerDistance &gt; 0){</span>
+<span class="fc" id="L82">            return true;</span>
+        }
+<span class="fc" id="L84">        return false;</span>
+    }
+    /**
+     * This method is responsible for the spawning of an entity and setting the value of the index in the 2D grid to the entity value
+     * @param row this represents the row in which the entity will spawn
+     * @param col   this represents the col in which the entity wil spawn
+     * @param entity this represents an integer value which represents what entity type it will be
+     * 
+     */
+    public void spawnEntity(int row, int col, int entity) {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (this.validSpawn(row, col)) {</span>
+<span class="fc" id="L95">            this.terrain[row][col] = entity;</span>
+        } else {
+<span class="fc" id="L97">            this.terrain[row][col] = 0;</span>
+        }
+<span class="fc" id="L99">    }</span>
+    /**
+     * Returns the map
+     * @return int[][] the map
+     */
+     public int[][] getMap(){
+<span class="fc" id="L105">        return this.terrain;</span>
+    }   
+    /**
+     * This is the recursive call required for recursive backtracking. It works by starting at a point and randomly picks an adjacent node. If that node 
+     * has not been visited, it will be added to the visited stack. If all adjacent nodes are vistied then continuously pop the stack until a node has adjacent
+     * nodes available. Repeat until the stack is empty.
+     * @param x this is the current column in the 2D grid
+     * @param y this is the current row in the 2D grid
+     * @param visited this is the stack that contains all visited nodes
+     */
+    private void recursiveBacktracking(int x, int y, Stack&lt;Integer&gt; visited) {
+<span class="fc" id="L116">        int currentIndex = y * this.mapWidth + x;</span>
+        //Loop until there are adjacent nodes that are unvisited
+<span class="fc bfc" id="L118" title="All 16 branches covered.">        while ((x + 2 &gt;= this.mapWidth || this.terrain[y][x + 2] == 0) &amp;&amp;</span>
+                (x - 2 &lt; 0 || this.terrain[y][x - 2] == 0) &amp;&amp;
+                (y + 2 &gt;= this.mapHeight || this.terrain[y + 2][x] == 0) &amp;&amp;
+                (y - 2 &lt; 0 || this.terrain[y - 2][x] == 0)) {
+            //Exit if stack is empty
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if (visited.isEmpty()) {</span>
+<span class="fc" id="L124">                return;</span>
+            }
+<span class="fc" id="L126">            currentIndex = visited.pop();</span>
+            //convert the index from the stack to a row and col value
+<span class="fc" id="L128">            y = currentIndex / this.mapWidth;</span>
+<span class="fc" id="L129">            x = currentIndex % this.mapWidth;</span>
+        }
+        int direction;
+<span class="fc" id="L132">        int dX = 0;</span>
+<span class="fc" id="L133">        int dY = 0;</span>
+<span class="fc" id="L134">        int newX = 0;</span>
+<span class="fc" id="L135">        int newY = 0;</span>
+        do {
+<span class="fc" id="L137">            dX = 0;</span>
+<span class="fc" id="L138">            dY = 0;</span>
+<span class="fc" id="L139">            direction = rand.nextInt(4);</span>
+<span class="fc" id="L140">            newY = currentIndex / this.mapWidth;</span>
+<span class="fc" id="L141">            newX = currentIndex % this.mapWidth;</span>
+<span class="pc bpc" id="L142" title="1 of 5 branches missed.">            switch (direction) {</span>
+                //right
+                case 0:
+<span class="fc" id="L145">                    dX = 2;</span>
+<span class="fc" id="L146">                    break;</span>
+                //down
+                case 1:
+<span class="fc" id="L149">                    dY = 2;</span>
+<span class="fc" id="L150">                    break;</span>
+                //left
+                case 2:
+<span class="fc" id="L153">                    dX = -2;</span>
+<span class="fc" id="L154">                    break;</span>
+                //up
+                case 3:
+<span class="fc" id="L157">                    dY = -2;</span>
+                    break;
+            }
+<span class="fc" id="L160">            newX += dX;</span>
+<span class="fc" id="L161">            newY += dY;</span>
+<span class="fc bfc" id="L162" title="All 10 branches covered.">        } while (newX &gt;= this.mapWidth || newX &lt; 0 || newY &gt;= this.mapHeight || newY &lt; 0</span>
+                || this.terrain[newY][newX] == 0);
+
+<span class="fc" id="L165">        int newIndex = this.mapWidth * newY + newX;</span>
+
+        //set the value to 0 to produce a walkable path
+<span class="fc" id="L168">        this.terrain[y + dY / 2][x + dX / 2] = 0;</span>
+<span class="fc" id="L169">        this.terrain[newY][newX] = 0;</span>
+
+
+        //Room generating has different conditions depending on the direction
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        boolean spawnRoom = rand.nextInt(10) == 0;</span>
+
+<span class="fc" id="L175">        int roomWidth = this.roomWidth;</span>
+<span class="fc" id="L176">        int roomHeight = this.roomHeight;</span>
+<span class="fc bfc" id="L177" title="All 10 branches covered.">        if (spawnRoom &amp;&amp; newX + roomWidth &lt; this.mapWidth &amp;&amp; newX - roomWidth &gt;= 0 &amp;&amp; newY + roomHeight &lt; this.mapHeight</span>
+                &amp;&amp; newY - roomHeight &gt;= 0) {
+<span class="pc bpc" id="L179" title="1 of 5 branches missed.">            switch (direction) {</span>
+                case 0:
+
+<span class="fc bfc" id="L182" title="All 2 branches covered.">                    for (int i = newY - roomHeight / 2; i &lt; newY + roomHeight; i++) {</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">                        for (int j = newX; j &lt; roomWidth; j++) {</span>
+<span class="nc" id="L184">                            this.terrain[i][j] = 0;</span>
+<span class="nc" id="L185">                            int index = i * this.mapWidth + j;</span>
+<span class="nc" id="L186">                            int randNum = rand.nextInt(15);</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                            if (randNum == 0){</span>
+<span class="nc" id="L188">                                this.spawnEntity(i,j,4);</span>
+                            }
+<span class="nc bnc" id="L190" title="All 2 branches missed.">                            if (randNum == 1){</span>
+<span class="nc" id="L191">                                this.spawnEntity(i,j,3);</span>
+                            }
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                            if (randNum == 3){</span>
+<span class="nc" id="L194">                                this.spawnEntity(i,j,5);</span>
+                            }
+<span class="nc bnc" id="L196" title="All 2 branches missed.">                            if (randNum == 4){</span>
+<span class="nc" id="L197">                                this.spawnEntity(i,j,6);</span>
+                            }
+<span class="nc bnc" id="L199" title="All 4 branches missed.">                            if (i % 2 != 0 &amp;&amp; j % 2 != 0) {</span>
+<span class="nc" id="L200">                                visited.push(index);</span>
+                            }
+                        }
+                    }
+<span class="fc" id="L204">                    break;</span>
+                case 1:
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                    for (int i = newY; i &lt; newY + roomHeight; i++) {</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">                        for (int j = newX - roomWidth / 2; j &lt; newX + roomWidth; j++) {</span>
+<span class="fc" id="L208">                            this.terrain[i][j] = 0;</span>
+<span class="fc" id="L209">                            int index = i * this.mapWidth + j;</span>
+<span class="fc" id="L210">                            int randNum = rand.nextInt(15);</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">                            if (randNum == 0){</span>
+<span class="fc" id="L212">                                this.spawnEntity(i,j,4);</span>
+                            }
+<span class="fc bfc" id="L214" title="All 2 branches covered.">                            if (randNum == 1) {</span>
+<span class="fc" id="L215">                                this.spawnEntity(i, j, 3);</span>
+                            }
+<span class="fc bfc" id="L217" title="All 2 branches covered.">                            if (randNum == 3){</span>
+<span class="fc" id="L218">                                  this.spawnEntity(i,j,5);</span>
+                            }
+<span class="fc bfc" id="L220" title="All 2 branches covered.">                            if (randNum == 4){</span>
+<span class="fc" id="L221">                                this.spawnEntity(i,j,6);</span>
+                            }
+<span class="fc bfc" id="L223" title="All 4 branches covered.">                            if(i%2 != 0 &amp;&amp; j%2 != 0){</span>
+<span class="fc" id="L224">                                visited.push(index);</span>
+                            }
+                        }
+                    }
+<span class="fc" id="L228">                    break;</span>
+                case 2:
+<span class="fc bfc" id="L230" title="All 2 branches covered.">                    for (int i = newY - roomHeight / 2; i &lt; newY + roomHeight; i++) {</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">                        for (int j = newX; j &gt; newX - roomWidth; j--) {</span>
+<span class="fc" id="L232">                            this.terrain[i][j] = 0;</span>
+<span class="fc" id="L233">                            int index = i * this.mapWidth + j;</span>
+<span class="fc" id="L234">                            int randNum = rand.nextInt(15);</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">                            if (randNum == 0){</span>
+<span class="fc" id="L236">                                this.spawnEntity(i,j,4);</span>
+                            }
+<span class="fc bfc" id="L238" title="All 2 branches covered.">                            if (randNum == 1) {</span>
+<span class="fc" id="L239">                                this.spawnEntity(i, j, 3);</span>
+                            }
+<span class="fc bfc" id="L241" title="All 2 branches covered.">                            if (randNum == 3) {</span>
+<span class="fc" id="L242">                                this.spawnEntity(i, j, 5);</span>
+                            }
+<span class="fc bfc" id="L244" title="All 2 branches covered.">                            if (randNum == 4){</span>
+<span class="fc" id="L245">                                this.spawnEntity(i,j,6);</span>
+                            }
+<span class="fc bfc" id="L247" title="All 4 branches covered.">                            if(i%2 != 0 &amp;&amp; j%2 != 0){</span>
+<span class="fc" id="L248">                                visited.push(index);</span>
+                            }
+                        }
+                    }
+<span class="fc" id="L252">                    break;</span>
+                case 3:
+<span class="fc bfc" id="L254" title="All 2 branches covered.">                    for (int i = newY; i &gt; newY - roomHeight; i--) {</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">                        for (int j = newX - roomWidth / 2; j &lt; newX + roomWidth; j++) {</span>
+<span class="fc" id="L256">                            this.terrain[i][j] = 0;</span>
+<span class="fc" id="L257">                            int index = i * this.mapWidth + j;</span>
+<span class="fc" id="L258">                            int randNum = rand.nextInt(15);</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">                            if (randNum == 0){</span>
+<span class="fc" id="L260">                                this.spawnEntity(i,j,4);</span>
+                            }
+<span class="fc bfc" id="L262" title="All 2 branches covered.">                            if (randNum == 1) {</span>
+<span class="fc" id="L263">                                this.spawnEntity(i, j, 3);</span>
+                            }
+<span class="fc bfc" id="L265" title="All 2 branches covered.">                            if (randNum == 3) {</span>
+<span class="fc" id="L266">                                this.spawnEntity(i, j, 5);</span>
+                            }
+<span class="fc bfc" id="L268" title="All 2 branches covered.">                            if (randNum == 4){</span>
+<span class="fc" id="L269">                                this.spawnEntity(i,j,6);</span>
+                            }
+<span class="fc bfc" id="L271" title="All 4 branches covered.">                            if(i%2 != 0 &amp;&amp; j%2 != 0){</span>
+<span class="fc" id="L272">                                visited.push(index);</span>
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        //Spawning an endpoint for the player. spawnPoint boolean ensures that there is exactly one endpoint spawning. Distance checker will make sure that it is far from player
+<span class="fc" id="L280">        visited.push(newIndex);</span>
+<span class="fc" id="L281">        recursiveBacktracking(newX, newY, visited);</span>
+<span class="fc" id="L282">    }</span>
+
+
+    public void printMap() {
+        // int[][] terrain = this.scaleMap(2);
+<span class="fc" id="L287">        int[][] terrain = this.terrain;</span>
+
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        for (int i = 0; i &lt; terrain.length; i++) {</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">            for (int j = 0; j &lt; terrain[0].length; j++) {</span>
+<span class="fc" id="L291">                System.out.print(terrain[i][j]);</span>
+            }
+<span class="fc" id="L293">            System.out.println();</span>
+        }
+<span class="fc" id="L295">    }</span>
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

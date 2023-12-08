@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Punishment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">game</a> &gt; <a href="index.source.html" class="el_package">group2.Rewards</a> &gt; <span class="el_source">Punishment.java</span></div><h1>Punishment.java</h1><pre class="source lang-java linenums">// Sprite Source: https://opengameart.org/content/camp-fire-animation-for-rpgs-finished
+
+/**
+ * The Punishment class represents a punishment in the game world.
+ * Punishments are static and when the player collides with them, the 
+ * Player's score should be reduced. If their score is less than 
+ * Zero, the game ends.
+ * 
+ * Each punishment has an associated animation that plays when it appears in the game.
+ *
+ *
+ * The class extends the StaticEntity class and implements methods for animations and drawing.
+ */
+
+package group2.Rewards;
+
+import group2.StaticEntity;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import group2.GamePanel;
+
+import group2.Game;
+
+public class Punishment extends StaticEntity {
+
+    // arrays to hold the different animation sprites
+<span class="nc" id="L32">    private BufferedImage[] bufferedImage = new BufferedImage[5];</span>
+    private int currentFrameIndex;
+<span class="nc" id="L34">    private int slowDown = 0;</span>
+
+    /**
+     * Constructs a Punishment object with the specified parameters.
+     *
+     * @param positionX         The X-coordinate of the punishment in the game
+     *                          world.
+     * @param positionY         The Y-coordinate of the punishment in the game
+     *                          world.
+     * @param height            The height of the punishment.
+     * @param width             The width of the punishment.
+     * @param punishValue       The negative value representing the impact of the
+     *                          punishment on the score.
+     * @param mainCharacterData An array containing main character data: [mcX, mcY,
+     *                          mcPosX, mcPosY, TILE_SIZE].
+     * @throws IllegalArgumentException If the punishValue is not negative.
+     */
+
+    public Punishment(int positionX, int positionY, int height, int width, int punishValue, int[] mainCharacterData) {
+<span class="nc" id="L53">        super(positionX, positionY, height, width, punishValue, mainCharacterData);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (punishValue &gt;= 0) {</span>
+<span class="nc" id="L55">            throw new IllegalArgumentException(&quot;Punishment value must be negative!&quot;);</span>
+        }
+<span class="nc" id="L57">        bufferedImage = loadFrames(&quot;/resources/sprites/Punishment/punish&quot;, 5);</span>
+<span class="nc" id="L58">    }</span>
+
+    /**
+     * Loads animation frames from the specified path.
+     *
+     * @param path       The path to the animation frames.
+     * @param frameCount The number of frames in the animation.
+     * @return An array of BufferedImages representing the animation frames.
+     */
+
+    private BufferedImage[] loadFrames(String path, int frameCount) {
+<span class="nc" id="L69">        BufferedImage[] frames = new BufferedImage[frameCount];</span>
+        try {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            for (int i = 0; i &lt; frameCount; i++) {</span>
+                // testing
+                // System.out.println(&quot;TESTING: Image Path: &quot; + &quot;game&quot; + path + (i + 1) +
+                // &quot;.png\n&quot;);
+<span class="nc" id="L75">                frames[i] = ImageIO.read(new File(&quot;game&quot; + path + (i + 1) + &quot;.png&quot;));</span>
+
+                // testing
+                // System.out.println(&quot;Images loaded successfully!\n&quot;);
+            }
+<span class="nc" id="L80">        } catch (IOException e) {</span>
+<span class="nc" id="L81">            System.out.println(&quot;ERROR: Couldn't load images!\n&quot;);</span>
+<span class="nc" id="L82">            e.printStackTrace();</span>
+<span class="nc" id="L83">        }</span>
+<span class="nc" id="L84">        return frames;</span>
+    }
+
+    public void updateAnimation() {
+        // Advance the frame index for the animation
+<span class="nc" id="L89">        changeFrame();</span>
+<span class="nc" id="L90">    }</span>
+
+    private void changeFrame() {
+<span class="nc" id="L93">        slowDown++;</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (slowDown == 5) {</span>
+<span class="nc" id="L95">            slowDown = 0;</span>
+<span class="nc" id="L96">            currentFrameIndex++;</span>
+        }
+
+        // Reset the frame index to loop the animation
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (currentFrameIndex &gt;= bufferedImage.length) {</span>
+<span class="nc" id="L101">            currentFrameIndex = 0;</span>
+        }
+<span class="nc" id="L103">    }</span>
+
+    public BufferedImage getCurrentFrame() {
+<span class="nc" id="L106">        return bufferedImage[currentFrameIndex];</span>
+    }
+
+    /**
+     * Draws the punishment on the graphics context.
+     *
+     * @param g2 The Graphics2D context to draw on.
+     * @param gp The GamePanel containing the main character information.
+     */
+    public void draw(Graphics2D g2, GamePanel gp) {
+<span class="nc" id="L116">        BufferedImage frame = getCurrentFrame();</span>
+
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (frame != null) {</span>
+            // Draw the frame at the desired position (e.g., getX() and getY())
+<span class="nc" id="L120">            int screenX = getPositionX() + gp.mainCharacter.mcX - gp.mainCharacter.positionX;</span>
+<span class="nc" id="L121">            int screenY = getPositionY() + gp.mainCharacter.mcY - gp.mainCharacter.positionY;</span>
+
+<span class="nc" id="L123">            g2.drawImage(frame, screenX, screenY, getWidth(), getHeight(), null);</span>
+        }
+<span class="nc" id="L125">    }</span>
+
+    // getters and setters
+    public int getPunishValue() {
+<span class="nc" id="L129">        return this.getEffectValue();</span>
+    }
+
+    public void setPunishValue(int punishValue) {
+<span class="nc" id="L133">        this.setEffectValue(punishValue);</span>
+<span class="nc" id="L134">    }</span>
+
+    /**
+     * Decreases the game score based on the punishment value.
+     *
+     * @param game        The Game object.
+     * @param punishValue The punishment value to subtract from the score.
+     */
+    public void decreaseScore(Game game, int punishValue) {
+<span class="nc" id="L143">        game.updateScore(punishValue);</span>
+
+<span class="nc" id="L145">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
