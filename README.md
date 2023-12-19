@@ -32,11 +32,11 @@ Luffy chatbot. There will also be different themed “islands” with unique ene
 mysteries to uncover. Follow along Monkey D Luffy, avoiding the navy and other adversaries,<br />
 staying out of jail, and find the legendary “ONE PIECE”!<br />
 
-UML Diagram:
+UML Diagram:<br />
 ![image](https://github.com/suke404/DA-ONE-PIECE/assets/85700523/65d968aa-b357-4de8-b997-e63897d03567)
 
 
-Game Interface:
+Game Interface:<br />
 ![image](https://github.com/suke404/DA-ONE-PIECE/assets/85700523/13c6b897-ec1e-4ce2-8e66-57464d92e3dc)
 
 
